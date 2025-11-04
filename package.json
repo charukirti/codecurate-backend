@@ -1,0 +1,42 @@
+{
+  "name": "codecurate-backend",
+  "version": "1.0.0",
+  "description": "backend for codecurate",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/app.js",
+    "dev": "tsx watch src/app.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx src/db/migrate.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/charukirti/codecurate-backend.git"
+  },
+  "author": "charukirti",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/charukirti/codecurate-backend/issues"
+  },
+  "homepage": "https://github.com/charukirti/codecurate-backend#readme",
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.2.3",
+    "drizzle-orm": "^0.44.7",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/express": "^5.0.5",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.10.0",
+    "drizzle-kit": "^0.31.6",
+    "nodemon": "^3.1.10",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
