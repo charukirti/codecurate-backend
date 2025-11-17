@@ -7,6 +7,7 @@ import {
   timestamp,
   uuid,
   varchar,
+  bigint,
 } from "drizzle-orm/pg-core";
 
 export const typeEnum = pgEnum("type", ["video", "playlist"]);
@@ -22,8 +23,8 @@ export const resources = pgTable("resources", {
   thumbnails: jsonb("thumbnails").notNull(),
   durationIso: varchar("duration_iso", { length: 20 }).notNull(),
   durationSeconds: integer("duration_seconds").notNull(),
-  viewCount: integer("view_count").notNull(),
-  likeCount: integer("like_count").notNull(),
+  viewCount: bigint("view_count", { mode: "number" }).notNull(),
+  likeCount: bigint("like_count", { mode: "number" }).notNull(),
   videoLang: varchar("video_lang").notNull(),
   codeLang: varchar("code_lang").notNull(),
   topic: varchar("video_topic", { length: 100 }).notNull(),
