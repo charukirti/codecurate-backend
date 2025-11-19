@@ -28,6 +28,7 @@ export const resources = pgTable("resources", {
   videoLang: varchar("video_lang").notNull(),
   codeLang: varchar("code_lang").notNull(),
   topic: varchar("video_topic", { length: 100 }).notNull(),
+  youtubeId: varchar("youtube_id", { length: 100 }).notNull().unique(),
   playlistId: varchar("playlist_id", { length: 100 }),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
