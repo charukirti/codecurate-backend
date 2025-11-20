@@ -14,22 +14,27 @@ export const typeEnum = pgEnum("type", ["video", "playlist"]);
 
 export const resources = pgTable("resources", {
   id: uuid("id").defaultRandom().primaryKey(),
+
+  type: typeEnum("type").default("video").notNull(),
+  videoId: varchar("youtube_id", { length: 100 }).unique(),
+  playlistId: varchar("playlist_id", { length: 100 }).unique(),
+
   title: varchar("video_title", { length: 255 }).notNull(),
   description: text("video_description").notNull(),
-  type: typeEnum("type").default("video").notNull(),
   channelId: varchar("channel_id", { length: 100 }),
   channelName: varchar("channel_name", { length: 255 }).notNull(),
   publishedAt: timestamp("published_at").notNull(),
   thumbnails: jsonb("thumbnails").notNull(),
-  durationIso: varchar("duration_iso", { length: 20 }).notNull(),
-  durationSeconds: integer("duration_seconds").notNull(),
-  viewCount: bigint("view_count", { mode: "number" }).notNull(),
-  likeCount: bigint("like_count", { mode: "number" }).notNull(),
+
+  durationIso: varchar("duration_iso", { length: 20 }),
+  durationSeconds: integer("duration_seconds"),
+  viewCount: bigint("view_count", { mode: "number" }),
+  likeCount: bigint("like_count", { mode: "number" }),
+
   videoLang: varchar("video_lang").notNull(),
   codeLang: varchar("code_lang").notNull(),
   topic: varchar("video_topic", { length: 100 }).notNull(),
-  youtubeId: varchar("youtube_id", { length: 100 }).notNull().unique(),
-  playlistId: varchar("playlist_id", { length: 100 }),
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
