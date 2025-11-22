@@ -15,3 +15,9 @@ export const reviewTags = pgTable(
   },
   (table) => [t.primaryKey({ columns: [table.reviewId, table.tagId] })]
 );
+
+// type for data coming out of database after querying
+export type ReviewTag = typeof reviewTags.$inferSelect;
+
+// type for data going inside database
+export type NewReviewTag = typeof reviewTags.$inferInsert;
