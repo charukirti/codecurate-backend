@@ -7,8 +7,8 @@ import {
   uniqueIndex,
   index,
 } from "drizzle-orm/pg-core";
-import { users } from "./users.js";
-import { resources } from "./resources.js";
+import { users } from "./users";
+import { resources } from "./resources";
 import * as t from "drizzle-orm/pg-core";
 
 export const reviews = pgTable(
@@ -30,6 +30,8 @@ export const reviews = pgTable(
   },
   (table) => [
     t.uniqueIndex("unique_user_resource").on(table.userId, table.resourceId), // this will prevent duplicate reviews from one person
+
+    t.index("idx_reviews_resource_id").on(table.resourceId)
   ]
 );
 
