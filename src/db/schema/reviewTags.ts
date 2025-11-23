@@ -1,7 +1,7 @@
 import { pgTable, uuid } from "drizzle-orm/pg-core";
 import * as t from "drizzle-orm/pg-core";
-import { reviews } from "./review";
-import { tags } from "./tags";
+import { reviews } from "./review.js";
+import { tags } from "./tags.js";
 
 export const reviewTags = pgTable(
   "review_tags",

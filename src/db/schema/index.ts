@@ -1,10 +1,10 @@
 // export tables
-export * from "./resources";
-export * from "./users";
-export * from "./review";
-export * from "./tags";
-export * from "./reviewTags";
+export * from "./resources.js";
+export * from "./users.js";
+export * from "./review.js";
+export * from "./tags.js";
+export * from "./reviewTags.js";
 
 // export relations
 
-export * from "./relations";
+export * from "./relations.js";

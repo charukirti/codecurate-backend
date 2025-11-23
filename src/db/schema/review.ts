@@ -7,8 +7,8 @@ import {
   uniqueIndex,
   index,
 } from "drizzle-orm/pg-core";
-import { users } from "./users";
-import { resources } from "./resources";
+import { users } from "./users.js";
+import { resources } from "./resources.js";
 import * as t from "drizzle-orm/pg-core";
 
 export const reviews = pgTable(
@@ -24,14 +24,14 @@ export const reviews = pgTable(
 
     rating: integer("rating").notNull(),
     reviewText: text("review_text"), // review text is optional, here
-    
+
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
   },
   (table) => [
     t.uniqueIndex("unique_user_resource").on(table.userId, table.resourceId), // this will prevent duplicate reviews from one person
 
-    t.index("idx_reviews_resource_id").on(table.resourceId)
+    t.index("idx_reviews_resource_id").on(table.resourceId),
   ]
 );
 

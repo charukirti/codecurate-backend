@@ -1,9 +1,9 @@
 import { relations } from "drizzle-orm";
-import { resources } from "./resources";
-import { reviews } from "./review";
-import { users } from "./users";
-import { tags } from "./tags";
-import { reviewTags } from "./reviewTags";
+import { resources } from "./resources.js";
+import { reviews } from "./review.js";
+import { users } from "./users.js";
+import { tags } from "./tags.js";
+import { reviewTags } from "./reviewTags.js";
 
 export const resourcesRelations = relations(resources, ({ many }) => ({
   reviews: many(reviews), // one resource can have multiple reviews
