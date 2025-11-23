@@ -6,11 +6,11 @@ import { tags } from "./tags";
 import { reviewTags } from "./reviewTags";
 
 export const resourcesRelations = relations(resources, ({ many }) => ({
-  review: many(reviews), // one resource can have multiple reviews
+  reviews: many(reviews), // one resource can have multiple reviews
 }));
 
 export const userRelations = relations(users, ({ many }) => ({
-  review: many(reviews), // one user can have many reviews
+  reviews: many(reviews), // one user can have many reviews
 }));
 
 export const reviewsRelations = relations(reviews, ({ one, many }) => ({
