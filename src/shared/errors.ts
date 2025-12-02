@@ -1,19 +1,28 @@
+/**
+ * Base error class for all application errors
+ * - All custom errors extend AppError
+ * - Each error has proper HTTP status code
+ */
+
 export class AppError extends Error {
-  public statusCode: number;
-  public isOperational: boolean;
-  public code?: string;
+  public statusCode: number; // HTTP stauts code
+  public isOperational: boolean; // true: expected error, false: programming error
+  public code?: string; // Error code for frontend
 
   constructor(message: string, statusCode: number, code?: string) {
-    super(message);
+    super(message); // Pass message to parent error class
     this.statusCode = statusCode;
-    this.isOperational = true;
+    this.isOperational = true; // All AppErrors are expected/handled errors
     this.code = code;
 
+    // Capture stack strace only in development mode
     if (process.env.NODE_ENV === "development") {
       Error.captureStackTrace(this, this.constructor);
     }
   }
 }
+
+/** 400 Bad Request: Invalid user input */
 
 export class ValidationError extends AppError {
   constructor(message: string, field?: string) {
@@ -21,11 +30,15 @@ export class ValidationError extends AppError {
   }
 }
 
+/** 404 Not Found - Resourse not found */
+
 export class NotFoundError extends AppError {
   constructor(resource: string = "resource") {
     super(`${resource} not found`, 404, "NOT_FOUND");
   }
 }
+
+/** 401 Unauthorized: When user is not logged in  */
 
 export class UnauthorizedError extends AppError {
   constructor(message: string = "Authentication Required") {
@@ -33,11 +46,15 @@ export class UnauthorizedError extends AppError {
   }
 }
 
+/** 403 Forbiden - Logged in but user has no permission */
+
 export class ForbidenError extends AppError {
   constructor(message: string = "Access denied") {
     super(message, 403, "FORBIDDEN");
   }
 }
+
+/** 409 Conflict - Resource already exist in DB */
 
 export class ConfilctError extends AppError {
   constructor(message: string) {
@@ -45,6 +62,7 @@ export class ConfilctError extends AppError {
   }
 }
 
+/** 500 Internal server error - Something went wrong on server side */
 export class InternalError extends AppError {
   constructor(message: string = "Internal server error") {
     super(message, 500, "INTERNAL_ERROR");
