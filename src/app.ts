@@ -2,6 +2,7 @@ import express from "express";
 import { ErrorHandler, notFoundHandler } from "./middlewares/errorHandler.js";
 import { AppError } from "./shared/errors.js";
 
+
 const app = express();
 
 app.use(express.json());

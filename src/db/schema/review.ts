@@ -7,8 +7,8 @@ import {
   uniqueIndex,
   index,
 } from "drizzle-orm/pg-core";
-import { users } from "./users.js";
-import { resources } from "./resources.js";
+import { users } from "./users";
+import { resources } from "./resources";
 import * as t from "drizzle-orm/pg-core";
 
 export const reviews = pgTable(
