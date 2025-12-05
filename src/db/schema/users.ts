@@ -13,12 +13,13 @@ export const users = pgTable("users", {
   email: varchar("email", { length: 255 }).notNull().unique(),
   password: varchar("password", { length: 255 }).notNull(),
   isAdmin: boolean("is_admin").default(false).notNull(),
+  refreshToken: varchar("refresh_token", { length: 255 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 // type for data coming out of database after querying
-export type User = typeof users.$inferSelect
+export type User = typeof users.$inferSelect;
 
 // type for data going inside database
-export type NewUser = typeof users.$inferInsert
+export type NewUser = typeof users.$inferInsert;

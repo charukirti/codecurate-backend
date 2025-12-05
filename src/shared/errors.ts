@@ -68,3 +68,11 @@ export class InternalError extends AppError {
     super(message, 500, "INTERNAL_ERROR");
   }
 }
+
+/** Invalid credentials  */
+
+export class InvalidCredentialError extends AppError {
+  constructor(message: string) {
+    super(message, 400, "INVALID_CREDENTIALS");
+  }
+}
