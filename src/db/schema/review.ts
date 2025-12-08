@@ -1,37 +1,29 @@
-import {
-  integer,
-  uuid,
-  text,
-  pgTable,
-  timestamp,
-  uniqueIndex,
-  index,
-} from "drizzle-orm/pg-core";
-import { users } from "./users";
-import { resources } from "./resources";
-import * as t from "drizzle-orm/pg-core";
+import { integer, uuid, text, pgTable, timestamp } from 'drizzle-orm/pg-core';
+import { users } from './users';
+import { resources } from './resources';
+import * as t from 'drizzle-orm/pg-core';
 
 export const reviews = pgTable(
-  "reviews",
+  'reviews',
   {
-    id: uuid("id").defaultRandom().primaryKey(),
-    userId: uuid("user_id")
-      .references(() => users.id, { onDelete: "cascade" })
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id')
+      .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
-    resourceId: uuid("resource_id")
-      .references(() => resources.id, { onDelete: "cascade" })
+    resourceId: uuid('resource_id')
+      .references(() => resources.id, { onDelete: 'cascade' })
       .notNull(),
 
-    rating: integer("rating").notNull(),
-    reviewText: text("review_text"), // review text is optional, here
+    rating: integer('rating').notNull(),
+    reviewText: text('review_text'), // review text is optional, here
 
-    createdAt: timestamp("created_at").defaultNow(),
-    updatedAt: timestamp("updated_at").defaultNow(),
+    createdAt: timestamp('created_at').defaultNow(),
+    updatedAt: timestamp('updated_at').defaultNow(),
   },
   (table) => [
-    t.uniqueIndex("unique_user_resource").on(table.userId, table.resourceId), // this will prevent duplicate reviews from one person
+    t.uniqueIndex('unique_user_resource').on(table.userId, table.resourceId), // this will prevent duplicate reviews from one person
 
-    t.index("idx_reviews_resource_id").on(table.resourceId),
+    t.index('idx_reviews_resource_id').on(table.resourceId),
   ]
 );
 
