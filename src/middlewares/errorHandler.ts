@@ -1,5 +1,6 @@
-import type { NextFunction, Request, Response } from "express";
-import { AppError, NotFoundError } from "../shared/errors.js";
+import type { NextFunction, Request, Response } from 'express';
+import { AppError, NotFoundError } from '../shared/errors.js';
+import Logger from '../utils/logger.js';
 
 interface ErrorResponse {
   success: false;
@@ -26,8 +27,8 @@ export function ErrorHandler(
   res: Response,
   next: NextFunction
 ): void {
-  if (process.env.NODE_ENV === "development") {
-    console.error("Error:", {
+  if (process.env.NODE_ENV === 'development') {
+    Logger.error('Error:', {
       message: err.message,
       stack: err.stack,
       url: req.url,
@@ -43,7 +44,7 @@ export function ErrorHandler(
     };
 
     // Send error stack only in development
-    if (process.env.NODE_ENV === "development" && err.stack) {
+    if (process.env.NODE_ENV === 'development' && err.stack) {
       response.stack = err.stack;
     }
 
@@ -54,12 +55,12 @@ export function ErrorHandler(
   const errorResponse: ErrorResponse = {
     success: false,
     message:
-      process.env.NODE_ENV === "development"
+      process.env.NODE_ENV === 'development'
         ? err.message
-        : "Internal server error",
+        : 'Internal server error',
   };
 
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV === 'development') {
     errorResponse.stack = err.stack;
   }
 
