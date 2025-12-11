@@ -7,6 +7,7 @@ interface ErrorResponse {
   message: string;
   code?: string | undefined;
   stack?: string | undefined;
+  field?: string | undefined;
 }
 
 /**
@@ -41,6 +42,7 @@ export function ErrorHandler(
       success: false,
       message: err.message,
       code: err.code,
+      field: err.field,
     };
 
     // Send error stack only in development
