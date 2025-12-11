@@ -4,18 +4,19 @@ import {
   uuid,
   boolean,
   timestamp,
-} from "drizzle-orm/pg-core";
+  text,
+} from 'drizzle-orm/pg-core';
 
-export const users = pgTable("users", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  name: varchar("name", { length: 255 }).notNull(),
-  username: varchar("username", { length: 100 }).notNull().unique(),
-  email: varchar("email", { length: 255 }).notNull().unique(),
-  password: varchar("password", { length: 255 }).notNull(),
-  isAdmin: boolean("is_admin").default(false).notNull(),
-  refreshToken: varchar("refresh_token", { length: 255 }),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+export const users = pgTable('users', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  name: varchar('name', { length: 255 }).notNull(),
+  username: varchar('username', { length: 100 }).notNull().unique(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
+  password: varchar('password', { length: 255 }).notNull(),
+  isAdmin: boolean('is_admin').default(false).notNull(),
+  refreshToken: text('refresh_token'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 // type for data coming out of database after querying

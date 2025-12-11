@@ -15,6 +15,13 @@
       "when": 1764936735571,
       "tag": "0001_breezy_molly_hayes",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1765460367754,
+      "tag": "0002_cloudy_epoch",
+      "breakpoints": true
     }
   ]
 }
