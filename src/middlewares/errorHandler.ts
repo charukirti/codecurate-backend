@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
 import { AppError, NotFoundError } from '../shared/errors.js';
 import Logger from '../utils/logger.js';
+import appConfig from '../config/app.config.js';
 
 interface ErrorResponse {
   success: false;
@@ -28,7 +29,7 @@ export function ErrorHandler(
   res: Response,
   next: NextFunction
 ): void {
-  if (process.env.NODE_ENV === 'development') {
+  if (appConfig.node_env === 'development') {
     Logger.error('Error:', {
       message: err.message,
       stack: err.stack,
@@ -46,7 +47,7 @@ export function ErrorHandler(
     };
 
     // Send error stack only in development
-    if (process.env.NODE_ENV === 'development' && err.stack) {
+    if (appConfig.node_env === 'development' && err.stack) {
       response.stack = err.stack;
     }
 
@@ -57,12 +58,12 @@ export function ErrorHandler(
   const errorResponse: ErrorResponse = {
     success: false,
     message:
-      process.env.NODE_ENV === 'development'
+      appConfig.node_env === 'development'
         ? err.message
         : 'Internal server error',
   };
 
-  if (process.env.NODE_ENV === 'development') {
+  if (appConfig.node_env === 'development') {
     errorResponse.stack = err.stack;
   }
 

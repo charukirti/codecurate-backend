@@ -4,6 +4,8 @@
  * - Each error has proper HTTP status code
  */
 
+import appConfig from '../config/app.config';
+
 export class AppError extends Error {
   public statusCode: number; // HTTP stauts code
   public isOperational: boolean; // true: expected error, false: programming error
@@ -23,7 +25,7 @@ export class AppError extends Error {
     this.code = code;
 
     // Capture stack strace only in development mode
-    if (process.env.NODE_ENV === 'development') {
+    if (appConfig.node_env === 'development') {
       Error.captureStackTrace(this, this.constructor);
     }
   }
