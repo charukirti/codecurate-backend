@@ -1,12 +1,11 @@
 import { Router } from 'express';
-import { signUp } from './auth.controller';
+import { signIn, signUp } from './auth.controller';
 import { validate } from '../../middlewares/validate';
-import { signUpSchema } from './auth.schema';
+import { signInSchema, signUpSchema } from './auth.schema';
 
 const router = Router();
 
-// signUp route
-
 router.post('/signup', validate(signUpSchema), signUp);
+router.post('/signin', validate(signInSchema), signIn);
 
 export default router;

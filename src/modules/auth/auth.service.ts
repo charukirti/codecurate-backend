@@ -65,7 +65,7 @@ export const authService = {
   async signIn(data: SignInInput): Promise<{
     accessToken: string;
     refreshToken: string;
-    userData: Omit<User, 'password'>;
+    userData: Omit<User, 'password' | 'refreshToken'>;
   }> {
     const { email, password } = data;
 
@@ -78,7 +78,7 @@ export const authService = {
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      throw new InvalidCredentialError('Invalid username or password');
+      throw new InvalidCredentialError('Invalid email or password');
     }
 
     const accessToken = generateAccessToken(user.id);
@@ -89,7 +89,11 @@ export const authService = {
       .set({ refreshToken: refreshToken })
       .where(eq(users.id, user.id));
 
-    const { password: _, ...userData } = user;
+    const {
+      password: _password,
+      refreshToken: _refreshToken,
+      ...userData
+    } = user;
 
     return { accessToken, refreshToken, userData };
   },
