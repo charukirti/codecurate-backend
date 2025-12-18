@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import { SignInInput, SignUpInput } from './auth.schema';
 import { authService } from './auth.service';
 import appConfig from '../../config/app.config';
+import { UnauthorizedError } from '../../shared/errors';
 
 export async function signUp(
   req: Request<{}, {}, SignUpInput>,
@@ -40,6 +41,51 @@ export async function signIn(
     res.status(200).json({
       message: 'User signed in successfully',
       user: userData,
+      accessToken,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function signOut(req: Request, res: Response, next: NextFunction) {
+  try {
+    const userId = req.userId;
+    await authService.signOut(userId!);
+
+    res.clearCookie('refreshToken');
+
+    res.status(200).json({
+      message: 'User successfully signed out',
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function refreshToken(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      throw new UnauthorizedError('No refresh token provided');
+    }
+
+    const { accessToken, refreshToken: newRefreshToken } =
+      await authService.refreshToken(refreshToken);
+
+    res.cookie('refreshToken', newRefreshToken, {
+      httpOnly: true,
+      secure: appConfig.node_env === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({
+      message: 'New refresh token generated',
       accessToken,
     });
   } catch (error) {

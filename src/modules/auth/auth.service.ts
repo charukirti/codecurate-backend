@@ -6,12 +6,16 @@ import {
   ConflictError,
   InternalError,
   InvalidCredentialError,
+  NotFoundError,
+  UnauthorizedError,
 } from '../../shared/errors';
 import bcrypt from 'bcryptjs';
 import {
   generateAccessToken,
   generateRefreshToken,
 } from '../../utils/generateToken';
+import jwt from 'jsonwebtoken';
+import authConfig from '../../config/auth.config';
 
 export const authService = {
   /**
@@ -96,5 +100,56 @@ export const authService = {
     } = user;
 
     return { accessToken, refreshToken, userData };
+  },
+
+  /**
+   * Signs out user by clearing refresh token
+   * @param userId - User ID from JWT
+   */
+
+  async signOut(userId: string): Promise<void> {
+    await db
+      .update(users)
+      .set({ refreshToken: null })
+      .where(eq(users.id, userId));
+  },
+
+  /**
+   * Refreshes access token using refresh token
+   * @param refreshToken - Refresh token from cookie
+   * @returns New access token and refresh token
+   * @throws {UnauthorizedError} if token is invalid
+   * @throws {NotFoundError} if user does not exists
+   */
+
+  async refreshToken(
+    refreshToken: string
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    const decode = jwt.verify(refreshToken, authConfig.refresh_secret) as {
+      userId: string;
+    };
+
+    const userId = decode.userId;
+
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
+
+    if (!user) {
+      throw new NotFoundError('User does not exists');
+    }
+
+    if (user.refreshToken !== refreshToken) {
+      throw new UnauthorizedError('Invalid refresh token');
+    }
+
+    const accessToken = generateAccessToken(user.id);
+
+    const newRefreshToken = generateRefreshToken(user.id);
+
+    await db
+      .update(users)
+      .set({ refreshToken: newRefreshToken })
+      .where(eq(users.id, user.id));
+
+    return { accessToken, refreshToken: newRefreshToken };
   },
 };
