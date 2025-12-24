@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1764774724084,
-      "tag": "0000_nappy_may_parker",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1764936735571,
-      "tag": "0001_breezy_molly_hayes",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1765460367754,
-      "tag": "0002_cloudy_epoch",
+      "when": 1766596541396,
+      "tag": "0000_flashy_starjammers",
       "breakpoints": true
     }
   ]

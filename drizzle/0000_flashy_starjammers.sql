@@ -1,4 +1,5 @@
 CREATE TYPE "public"."type" AS ENUM('video', 'playlist');--> statement-breakpoint
+CREATE TYPE "public"."role_enum" AS ENUM('user', 'admin');--> statement-breakpoint
 CREATE TABLE "resources" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"type" "type" DEFAULT 'video' NOT NULL,
@@ -29,7 +30,8 @@ CREATE TABLE "users" (
 	"username" varchar(100) NOT NULL,
 	"email" varchar(255) NOT NULL,
 	"password" varchar(255) NOT NULL,
-	"is_admin" boolean DEFAULT false NOT NULL,
+	"role" "role_enum" DEFAULT 'user' NOT NULL,
+	"refresh_token" text,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "users_username_unique" UNIQUE("username"),

@@ -47,6 +47,7 @@ export const authService = {
         username,
         email,
         password: hashedPassword,
+        role: 'user',
       })
       .returning();
 
@@ -85,7 +86,7 @@ export const authService = {
       throw new InvalidCredentialError('Invalid email or password');
     }
 
-    const accessToken = generateAccessToken(user.id);
+    const accessToken = generateAccessToken(user.id, user.role);
     const refreshToken = generateRefreshToken(user.id);
 
     await db
@@ -141,7 +142,7 @@ export const authService = {
       throw new UnauthorizedError('Invalid refresh token');
     }
 
-    const accessToken = generateAccessToken(user.id);
+    const accessToken = generateAccessToken(user.id, user.role);
 
     const newRefreshToken = generateRefreshToken(user.id);
 

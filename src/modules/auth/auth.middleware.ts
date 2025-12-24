@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { UnauthorizedError } from '../../shared/errors';
+import { ForbidenError, UnauthorizedError } from '../../shared/errors';
 import jwt from 'jsonwebtoken';
 import authConfig from '../../config/auth.config';
 
@@ -23,9 +23,11 @@ export function verifyToken(
 
     const decoded = jwt.verify(token, authConfig.access_secret) as {
       userId: string;
+      role: 'admin' | 'user';
     };
 
     req.userId = decoded.userId;
+    req.role = decoded.role;
 
     next();
   } catch (error) {
@@ -39,4 +41,15 @@ export function verifyToken(
 
     next(error);
   }
+}
+
+export function requireAdmin(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void {
+  if (req.role !== 'admin') {
+    return next(new ForbidenError('Only admin can access this route'));
+  }
+  next();
 }

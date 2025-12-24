@@ -1,5 +1,5 @@
 {
-  "id": "cdd6eb0c-2623-43f4-8e5e-71b42c660e22",
+  "id": "1bd99094-680f-448e-8216-eb7486657a22",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -186,12 +186,19 @@
           "primaryKey": false,
           "notNull": true
         },
-        "is_admin": {
-          "name": "is_admin",
-          "type": "boolean",
+        "role": {
+          "name": "role",
+          "type": "role_enum",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
-          "default": false
+          "default": "'user'"
+        },
+        "refresh_token": {
+          "name": "refresh_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -475,6 +482,14 @@
       "values": [
         "video",
         "playlist"
+      ]
+    },
+    "public.role_enum": {
+      "name": "role_enum",
+      "schema": "public",
+      "values": [
+        "user",
+        "admin"
       ]
     }
   },

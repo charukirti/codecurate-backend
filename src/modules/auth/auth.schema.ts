@@ -20,7 +20,7 @@ export const signUpSchema = z.object({
     .min(7, 'Password must be at least 7 characters')
     .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
     .regex(/[0-9]/, 'Password must contain at least one number'),
-  isAdmin: z.boolean().default(false).optional(),
+  role: z.enum(['user', 'admin']).default('user'),
 });
 
 /**

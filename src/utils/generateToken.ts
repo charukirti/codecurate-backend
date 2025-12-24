@@ -1,8 +1,8 @@
 import jwt, { SignOptions } from 'jsonwebtoken';
 import authConfig from '../config/auth.config';
 
-export function generateAccessToken(userId: string) {
-  return jwt.sign({ userId }, authConfig.access_secret, {
+export function generateAccessToken(userId: string, role: string) {
+  return jwt.sign({ userId, role }, authConfig.access_secret, {
     expiresIn: authConfig.access_token_expiry as SignOptions['expiresIn'],
   });
 }
