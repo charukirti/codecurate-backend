@@ -8,6 +8,13 @@
       "when": 1766596541396,
       "tag": "0000_flashy_starjammers",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1767004128897,
+      "tag": "0001_breezy_maginty",
+      "breakpoints": true
     }
   ]
 }
