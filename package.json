@@ -34,6 +34,7 @@
   "homepage": "https://github.com/charukirti/codecurate-backend#readme",
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
+    "axios": "^1.13.2",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.2.3",

@@ -21,10 +21,10 @@ function validateEnv() {
 const env = validateEnv();
 
 const appConfig = {
-  port: env.PORT,
-  node_env: env.NODE_ENV,
-  yt_api_key: env.YT_API_KEY,
-  db_url: env.DATABASE_URL,
+  port: env.PORT!,
+  node_env: env.NODE_ENV!,
+  yt_api_key: env.YT_API_KEY!,
+  db_url: env.DATABASE_URL!,
 };
 
 export default appConfig;
