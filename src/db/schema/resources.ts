@@ -25,8 +25,8 @@ export const resources = pgTable('resources', {
   channelName: varchar('channel_name', { length: 255 }).notNull(),
   publishedAt: timestamp('published_at').notNull(),
   thumbnails: jsonb('thumbnails').notNull(),
+  itemCount: integer('item_count'),
 
-  durationIso: varchar('duration_iso', { length: 20 }),
   durationSeconds: integer('duration_seconds'),
   viewCount: bigint('view_count', { mode: 'number' }),
   likeCount: bigint('like_count', { mode: 'number' }),
