@@ -2,6 +2,7 @@ import express from 'express';
 import { ErrorHandler, notFoundHandler } from './middlewares/errorHandler.js';
 import authRoutes from './modules/auth/auth.routes.js';
 import userRoutes from './modules/users/users.routes.js';
+import resourceRoutes from './modules/resource/resource.routes.js';
 import cookieParser from 'cookie-parser';
 
 const app = express();
@@ -15,6 +16,7 @@ app.get('/health', (req, res) => {
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/resources', resourceRoutes);
 
 app.use(notFoundHandler);
 

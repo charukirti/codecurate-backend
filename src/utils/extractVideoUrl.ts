@@ -3,9 +3,14 @@ export interface YoutubeResult {
   playlistId: string | null;
 }
 
-export function extractVideoUrl(url: string): YoutubeResult {
+export function extractVideoUrl(url: string | undefined): YoutubeResult {
   try {
+    if (!url) {
+      throw new Error('Invalid YouTube URL');
+    }
+
     let safeUrl = url.trim();
+
     if (!safeUrl.startsWith('http://') && !safeUrl.startsWith('https://')) {
       safeUrl = 'https://' + safeUrl;
     }
