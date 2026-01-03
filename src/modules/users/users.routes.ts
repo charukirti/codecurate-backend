@@ -6,7 +6,7 @@ import { updateUser } from './users.schema';
 
 const router = Router();
 
-router.get('/user', verifyToken, getProfile);
-router.patch('/update', verifyToken, validate(updateUser), updateProfile);
+router.get('/me', verifyToken, getProfile);
+router.patch('/me', verifyToken, validate(updateUser), updateProfile);
 
 export default router;
