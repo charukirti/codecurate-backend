@@ -8,5 +8,5 @@ export function parseISOtoSeconds(ISOduration: string) {
   const minutes = parseInt(matches[2] || '0', 10);
   const seconds = parseInt(matches[3] || '0', 10);
 
-  return hours * 36000 + minutes * 60 + seconds;
+  return hours * 3600 + minutes * 60 + seconds;
 }
