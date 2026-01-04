@@ -23,8 +23,8 @@ export async function getVideoData(
       const resourceData = resourceService.prepareVideoData(
         youtubeData,
         videoLang!,
-        topic,
         codeLang,
+        topic,
         resourceType,
         videoId
       );

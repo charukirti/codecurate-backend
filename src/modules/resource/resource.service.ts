@@ -19,9 +19,9 @@ export const resourceService = {
     return {
       ...youtubeData,
       videoLang: videoLang || youtubeData.defaultAudioLanguage || 'unknown',
+      codeLang: codeLang,
       topic: topic,
       type: resourceType,
-      codeLang: codeLang,
       videoId: videoId,
     };
   },
