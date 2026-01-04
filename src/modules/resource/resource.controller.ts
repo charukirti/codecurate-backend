@@ -3,7 +3,6 @@ import { createResourceInput } from './resource.schema';
 import { extractVideoUrl } from '../../utils/extractVideoUrl';
 import { youtubeApiService } from './youtubeapi.service';
 import { resourceService } from './resource.service';
-import { NewResource } from '../../db/schema';
 
 export async function getVideoData(
   req: Request<{}, {}, createResourceInput>,
@@ -17,42 +16,32 @@ export async function getVideoData(
 
     let youtubeData;
     let savedResource;
+
     if (videoId) {
       youtubeData = await youtubeApiService.getVideoDetails(videoId!);
 
-      const resourceData: NewResource = {
-        title: youtubeData.title,
-        description: youtubeData.description,
-        thumbnails: youtubeData.thumbnails,
-        publishedAt: new Date(youtubeData.publishedAt),
-        channelName: youtubeData.channelTitle,
-        channelId: youtubeData.channelId,
-        videoId: videoId,
-        viewCount: Number(youtubeData.viewCount),
-        likeCount: Number(youtubeData.likeCount),
-        videoLang: videoLang || youtubeData.defaultAudioLanguage,
-        codeLang: codeLang,
-        topic: topic,
-        type: resourceType,
-        durationSeconds: youtubeData.duration,
-      };
+      const resourceData = resourceService.prepareVideoData(
+        youtubeData,
+        videoLang!,
+        topic,
+        codeLang,
+        resourceType,
+        videoId
+      );
+
       savedResource = await resourceService.createResource(resourceData);
     } else {
       youtubeData = await youtubeApiService.getPlaylistDetails(playlistId!);
-      const resourceData: NewResource = {
-        playlistId: playlistId,
-        channelId: youtubeData.channelId,
-        channelName: youtubeData.channelTitle,
-        title: youtubeData.title,
-        description: youtubeData.description,
-        itemCount: youtubeData.itemCount,
-        thumbnails: youtubeData.thumbnails,
-        codeLang: codeLang,
-        topic: topic,
-        videoLang: videoLang || 'unknown',
-        type: resourceType,
-        publishedAt: new Date(youtubeData.publishedAt),
-      };
+
+      const resourceData = resourceService.preparePlaylistResource(
+        youtubeData,
+        playlistId!,
+        codeLang,
+        topic,
+        videoLang!,
+        resourceType
+      );
+
       savedResource = await resourceService.createResource(resourceData);
     }
 

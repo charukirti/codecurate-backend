@@ -11,10 +11,10 @@ type Thumbnail = {
 
 export type VideoAPIResponse = {
   title: string;
-  publishedAt: string;
+  publishedAt: Date;
   description: string;
   channelId: string;
-  channelTitle: string;
+  channelName: string;
   thumbnails: {
     default: Thumbnail;
     medium: Thumbnail;
@@ -23,13 +23,13 @@ export type VideoAPIResponse = {
     maxres?: Thumbnail;
   };
   defaultAudioLanguage: string;
-  duration: number;
-  viewCount: string;
-  likeCount: string;
+  durationSeconds: number;
+  viewCount: number;
+  likeCount: number;
 };
 
 export type PlaylistAPIResponse = {
-  publishedAt: string;
+  publishedAt: Date;
   title: string;
   channelId: string;
   description: string;
@@ -40,6 +40,6 @@ export type PlaylistAPIResponse = {
     standard?: Thumbnail;
     maxres?: Thumbnail;
   };
-  channelTitle: string;
+  channelName: string;
   itemCount: number;
 };

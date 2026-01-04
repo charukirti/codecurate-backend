@@ -36,13 +36,13 @@ export const youtubeApiService = {
       title: snippet.title,
       description: snippet.description,
       channelId: snippet.channelId,
-      publishedAt: snippet.publishedAt,
-      channelTitle: snippet.channelTitle,
+      publishedAt: new Date(snippet.publishedAt),
+      channelName: snippet.channelTitle,
       thumbnails: snippet.thumbnails,
       defaultAudioLanguage: snippet.defaultAudioLanguage,
-      duration: duration || 0,
-      viewCount: stats.viewCount,
-      likeCount: stats.likeCount,
+      durationSeconds: duration || 0,
+      viewCount: parseInt(stats.viewCount),
+      likeCount: parseInt(stats.likeCount),
     };
   },
 
@@ -68,12 +68,12 @@ export const youtubeApiService = {
 
     return {
       channelId: snippet.channelId,
-      channelTitle: snippet.channelTitle,
+      channelName: snippet.channelTitle,
       title: snippet.title,
       description: snippet.description,
       thumbnails: snippet.thumbnails,
       itemCount: content.itemCount,
-      publishedAt: snippet.publishedAt,
+      publishedAt: new Date(snippet.publishedAt),
     };
   },
 };
