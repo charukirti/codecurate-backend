@@ -188,7 +188,7 @@ export const resourceService = {
    * @returns : if resource exist returns data array
    */
 
-  async getResourceById(id: string) {
+  async getResourceById(id: string): Promise<Resource> {
     const [resource] = await db
       .select()
       .from(resources)
@@ -199,5 +199,22 @@ export const resourceService = {
     }
 
     return resource;
+  },
+
+  /**
+   * Deletes single resource from database based on provided id
+   * @param id : gets resource id to delete resource
+   * @throws {NotFoundError} : if resource does not exist or already deleted throws not found error
+   */
+
+  async deleteResourceById(id: string): Promise<void> {
+    const [deletedResource] = await db
+      .delete(resources)
+      .where(eq(resources.id, id))
+      .returning();
+
+    if (!deletedResource) {
+      throw new NotFoundError('Resource not exist');
+    }
   },
 };
