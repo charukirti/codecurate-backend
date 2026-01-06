@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { createResourceInput } from './resource.schema';
+import { createResourceInput, getResourcesQuery } from './resource.schema';
 import { extractVideoUrl } from '../../utils/extractVideoUrl';
 import { youtubeApiService } from './youtubeapi.service';
 import { resourceService } from './resource.service';
 
-export async function getVideoData(
+export async function createResource(
   req: Request<{}, {}, createResourceInput>,
   res: Response,
   next: NextFunction
@@ -49,6 +49,40 @@ export async function getVideoData(
       message: `${videoId ? 'video data extracted successfully' : 'Playlist data extracted successfully'}`,
 
       data: savedResource,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getAllResources(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const {
+      search,
+      codeLang,
+      topic,
+      type,
+      page = 1,
+      limit = 10,
+    } = req.query as unknown as getResourcesQuery;
+
+    const { data, pagination } = await resourceService.getResources({
+      search,
+      codeLang,
+      topic,
+      type,
+      page,
+      limit,
+    });
+
+    res.status(200).json({
+      message: 'Fetched all resources successfully',
+      data,
+      pagination,
     });
   } catch (error) {
     next(error);

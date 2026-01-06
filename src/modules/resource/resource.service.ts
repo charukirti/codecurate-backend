@@ -1,4 +1,4 @@
-import { eq, or } from 'drizzle-orm';
+import { and, count, desc, eq, like, or } from 'drizzle-orm';
 import { db } from '../../db';
 import { NewResource, Resource, resources } from '../../db/schema';
 import { ConflictError, InternalError } from '../../shared/errors';
@@ -8,6 +8,17 @@ import {
 } from '../../types/youtube-api-response';
 
 export const resourceService = {
+  /**
+   * Prepares video data based on resource type and transforms to match with db schema
+   * @param youtubeData : takes youtube api response
+   * @param videoLang : takes audio language of the video
+   * @param codeLang : takes coding language used in the video
+   * @param topic : takes on which topic the video is based on
+   * @param resourceType : type of the resource between video and playlist
+   * @param videoId : takes extracted videoId from the url
+   * @returns data that matches with database schema
+   */
+
   prepareVideoData(
     youtubeData: VideoAPIResponse,
     videoLang: string,
@@ -26,6 +37,16 @@ export const resourceService = {
     };
   },
 
+  /**
+   * Prepares playlist data based on resource type and transforms to match with db schema
+   * @param youtubeData : takes youtube api response
+   * @param videoLang : takes audio language of the video
+   * @param codeLang : takes coding language used in the video
+   * @param topic : takes on which topic the video is based on
+   * @param resourceType : type of the resource between video and playlist
+   * @param playlistId : takes extracted playlistId from the url
+   * @returns data that matches with database schema
+   */
   preparePlaylistResource(
     youtubeData: PlaylistAPIResponse,
     playlistId: string,
@@ -44,6 +65,15 @@ export const resourceService = {
       type: resourceType,
     };
   },
+
+  /**
+   * Creates a new resource (video or playlist) in the database
+   * Checks for duplicates before insertion
+   * @param {NewResource} data : The resource data including type, topic, channel info, etc.
+   * @returns {Promise<Resource>}: The newly created resource with generated ID and timestamps
+   * @throws {ConflictError} : If a resource with the same videoId or playlistId already exists
+   * @throws {InternalError} : If database insertion fails
+   */
 
   async createResource(data: NewResource): Promise<Resource> {
     const [existingResource] = await db
@@ -71,5 +101,79 @@ export const resourceService = {
     }
 
     return newResource;
+  },
+
+  /**
+   * Retrieves paginated list of resources with optional filters and search
+   * Supports filtering by coding language, topic, and resource type
+   * Supports searching by title or channel name
+   * @param {object} params : Query parameters for filtering and pagination
+   * @returns {Promise<Object>} : Object containing data array and pagination metadata
+   */
+
+  async getResources(params: {
+    search?: string;
+    codeLang?: string;
+    topic?: string;
+    type?: 'video' | 'playlist';
+    page: number;
+    limit: number;
+  }) {
+    const { page, limit, codeLang, topic, type, search } = params;
+    const offset = (page - 1) * limit;
+
+    let conditions = [];
+
+    if (codeLang) {
+      conditions.push(eq(resources.codeLang, codeLang));
+    }
+
+    if (topic) {
+      conditions.push(eq(resources.topic, topic));
+    }
+
+    if (type) {
+      conditions.push(eq(resources.type, type));
+    }
+
+    if (search?.trim()) {
+      const searchTerm = `%${search}%`;
+      conditions.push(
+        or(
+          like(resources.title, searchTerm),
+          like(resources.channelName, searchTerm)
+        )
+      );
+    }
+
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+    const [countResult] = await db
+      .select({ count: count() })
+      .from(resources)
+      .where(whereClause);
+
+    const totalItems = Number(countResult?.count || 0);
+
+    const data = await db
+      .select()
+      .from(resources)
+      .where(whereClause)
+      .limit(limit)
+      .offset(offset)
+      .orderBy(desc(resources.createdAt));
+
+    const totalPages = Math.ceil(totalItems / limit);
+
+    return {
+      data,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalItems,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      },
+    };
   },
 };

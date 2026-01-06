@@ -1,9 +1,13 @@
 import { Router } from 'express';
-import { validate } from '../../middlewares/validate';
-import { createResourceSchema } from './resource.schema';
-import { getVideoData } from './resource.controller';
+import { validate, validateQuery } from '../../middlewares/validate';
+import {
+  createResourceSchema,
+  getResourcesQuerySchema,
+} from './resource.schema';
+import { createResource, getAllResources } from './resource.controller';
 
 const router = Router();
 
-router.post('/', validate(createResourceSchema), getVideoData);
+router.post('/', validate(createResourceSchema), createResource);
+router.get('/', validateQuery(getResourcesQuerySchema), getAllResources);
 export default router;
