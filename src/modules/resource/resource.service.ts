@@ -1,7 +1,11 @@
 import { and, count, desc, eq, like, or } from 'drizzle-orm';
 import { db } from '../../db';
 import { NewResource, Resource, resources } from '../../db/schema';
-import { ConflictError, InternalError } from '../../shared/errors';
+import {
+  ConflictError,
+  InternalError,
+  NotFoundError,
+} from '../../shared/errors';
 import {
   PlaylistAPIResponse,
   VideoAPIResponse,
@@ -175,5 +179,25 @@ export const resourceService = {
         hasPrevPage: page > 1,
       },
     };
+  },
+
+  /**
+   * Retrieves single resource from database
+   * @param id : parameter to for getting resource
+   * @throws {NotFoundError} : if resource does not exist throws not found error
+   * @returns : if resource exist returns data array
+   */
+
+  async getResourceById(id: string) {
+    const [resource] = await db
+      .select()
+      .from(resources)
+      .where(eq(resources.id, id));
+
+    if (!resource) {
+      throw new NotFoundError('Resource not found');
+    }
+
+    return resource;
   },
 };

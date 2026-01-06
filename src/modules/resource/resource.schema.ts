@@ -1,12 +1,3 @@
-/**
- * validation schema for resource module
- * data taking from user/admin
- * url : url of the resource (video/playlist)
- * type of resource (video or playlist)
- * coding language used in tutorial
- * topic of the tutorial/playlist
- */
-
 import z from 'zod';
 
 const YT_HOSTS = [
@@ -97,5 +88,10 @@ export const getResourcesQuerySchema = z.object({
     .default(10),
 });
 
+export const getResourceParamSchema = z.object({
+  id: z.uuid({ error: 'invalid UUID format' }),
+});
+
 export type createResourceInput = z.infer<typeof createResourceSchema>;
 export type getResourcesQuery = z.infer<typeof getResourcesQuerySchema>;
+export type getResourceByIdParam = z.infer<typeof getResourceParamSchema>;

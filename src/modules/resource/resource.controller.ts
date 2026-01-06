@@ -3,6 +3,7 @@ import { createResourceInput, getResourcesQuery } from './resource.schema';
 import { extractVideoUrl } from '../../utils/extractVideoUrl';
 import { youtubeApiService } from './youtubeapi.service';
 import { resourceService } from './resource.service';
+import { InvalidCredentialError } from '../../shared/errors';
 
 export async function createResource(
   req: Request<{}, {}, createResourceInput>,
@@ -83,6 +84,27 @@ export async function getAllResources(
       message: 'Fetched all resources successfully',
       data,
       pagination,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getResource(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { id } = req.params;
+
+    if (!id) throw new InvalidCredentialError('id is required');
+
+    const resource = await resourceService.getResourceById(id);
+
+    res.status(200).json({
+      message: 'Fetched resource successfully',
+      resource,
     });
   } catch (error) {
     next(error);
