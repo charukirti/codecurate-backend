@@ -1,5 +1,5 @@
 {
-  "id": "1bd99094-680f-448e-8216-eb7486657a22",
+  "id": "1aad48d7-fca2-4f09-b588-a7df85234d9d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -45,7 +45,7 @@
           "name": "video_description",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "channel_id": {
           "name": "channel_id",
@@ -71,9 +71,9 @@
           "primaryKey": false,
           "notNull": true
         },
-        "duration_iso": {
-          "name": "duration_iso",
-          "type": "varchar(20)",
+        "item_count": {
+          "name": "item_count",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
@@ -97,13 +97,13 @@
         },
         "video_lang": {
           "name": "video_lang",
-          "type": "varchar",
+          "type": "varchar(50)",
           "primaryKey": false,
           "notNull": true
         },
         "code_lang": {
           "name": "code_lang",
-          "type": "varchar",
+          "type": "varchar(50)",
           "primaryKey": false,
           "notNull": true
         },
@@ -324,6 +324,21 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "idx_reviews_user_id": {
+          "name": "idx_reviews_user_id",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
@@ -357,7 +372,12 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {},
+      "checkConstraints": {
+        "rating_range": {
+          "name": "rating_range",
+          "value": "rating >= 1 AND rating <= 10"
+        }
+      },
       "isRLSEnabled": false
     },
     "public.tags": {

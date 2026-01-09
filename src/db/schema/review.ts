@@ -1,7 +1,16 @@
-import { integer, uuid, text, pgTable, timestamp } from 'drizzle-orm/pg-core';
+import {
+  integer,
+  uuid,
+  text,
+  pgTable,
+  timestamp,
+  index,
+  uniqueIndex,
+  check,
+} from 'drizzle-orm/pg-core';
 import { users } from './users';
 import { resources } from './resources';
-import * as t from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 
 export const reviews = pgTable(
   'reviews',
@@ -15,15 +24,16 @@ export const reviews = pgTable(
       .notNull(),
 
     rating: integer('rating').notNull(),
-    reviewText: text('review_text'), // review text is optional, here
+    reviewText: text('review_text'),
 
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
   },
   (table) => [
-    t.uniqueIndex('unique_user_resource').on(table.userId, table.resourceId), // this will prevent duplicate reviews from one person
-
-    t.index('idx_reviews_resource_id').on(table.resourceId),
+    uniqueIndex('unique_user_resource').on(table.userId, table.resourceId),
+    index('idx_reviews_resource_id').on(table.resourceId),
+    index('idx_reviews_user_id').on(table.userId),
+    check('rating_range', sql`rating >= 1 AND rating <= 10`),
   ]
 );
 

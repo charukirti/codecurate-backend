@@ -6,17 +6,17 @@ CREATE TABLE "resources" (
 	"youtube_id" varchar(100),
 	"playlist_id" varchar(100),
 	"video_title" varchar(255) NOT NULL,
-	"video_description" text NOT NULL,
+	"video_description" text,
 	"channel_id" varchar(100),
 	"channel_name" varchar(255) NOT NULL,
 	"published_at" timestamp NOT NULL,
 	"thumbnails" jsonb NOT NULL,
-	"duration_iso" varchar(20),
+	"item_count" integer,
 	"duration_seconds" integer,
 	"view_count" bigint,
 	"like_count" bigint,
-	"video_lang" varchar NOT NULL,
-	"code_lang" varchar NOT NULL,
+	"video_lang" varchar(50) NOT NULL,
+	"code_lang" varchar(50) NOT NULL,
 	"video_topic" varchar(100) NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now(),
@@ -45,7 +45,8 @@ CREATE TABLE "reviews" (
 	"rating" integer NOT NULL,
 	"review_text" text,
 	"created_at" timestamp DEFAULT now(),
-	"updated_at" timestamp DEFAULT now()
+	"updated_at" timestamp DEFAULT now(),
+	CONSTRAINT "rating_range" CHECK (rating >= 1 AND rating <= 10)
 );
 --> statement-breakpoint
 CREATE TABLE "tags" (
@@ -68,4 +69,5 @@ ALTER TABLE "reviews" ADD CONSTRAINT "reviews_resource_id_resources_id_fk" FOREI
 ALTER TABLE "review_tags" ADD CONSTRAINT "review_tags_review_id_reviews_id_fk" FOREIGN KEY ("review_id") REFERENCES "public"."reviews"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "review_tags" ADD CONSTRAINT "review_tags_tag_id_tags_id_fk" FOREIGN KEY ("tag_id") REFERENCES "public"."tags"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE UNIQUE INDEX "unique_user_resource" ON "reviews" USING btree ("user_id","resource_id");--> statement-breakpoint
-CREATE INDEX "idx_reviews_resource_id" ON "reviews" USING btree ("resource_id");
+CREATE INDEX "idx_reviews_resource_id" ON "reviews" USING btree ("resource_id");--> statement-breakpoint
+CREATE INDEX "idx_reviews_user_id" ON "reviews" USING btree ("user_id");
