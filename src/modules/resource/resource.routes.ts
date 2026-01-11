@@ -4,6 +4,9 @@ import {
   validateParams,
   validateQuery,
 } from '../../middlewares/validate';
+
+import reviewRoutes from '../reviews/reviews.routes';
+
 import {
   createResourceSchema,
   getResourceParamSchema,
@@ -33,11 +36,13 @@ router.get(
   validateParams(getResourceParamSchema),
   getResource
 );
-router.get(
+router.delete(
   '/:id',
   verifyToken,
   requireAdmin,
   validateParams(getResourceParamSchema),
   deleteResource
 );
+
+router.use('/:resourceId/reviews', reviewRoutes);
 export default router;
