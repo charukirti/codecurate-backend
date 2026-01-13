@@ -13,21 +13,22 @@ import {
 export const reviewService = {
   async getAllTags(): Promise<Tags[]> {
     const allTags = await db.select().from(tags);
-    if (!allTags) {
+    if (!allTags || allTags.length === 0) {
       throw new NotFoundError('Tags does not exist');
     }
     return allTags;
   },
 
   async createReview(data: reviewData): Promise<ReviewWithTags | undefined> {
-    const { resourceId, userId, rating, reviewText, tagIds } = data;
-    const [resource] = await db
+    const { userId, resourceId, rating, reviewText, tagIds } = data;
+
+    const [existingResource] = await db
       .select()
       .from(resources)
       .where(eq(resources.id, resourceId));
 
-    if (!resource) {
-      throw new NotFoundError('Resource does not exist.');
+    if (!existingResource) {
+      throw new NotFoundError('Video or Playlist does not found');
     }
 
     const existingReview = await db.query.reviews.findFirst({
