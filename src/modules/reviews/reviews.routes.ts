@@ -1,5 +1,10 @@
 import { Router } from 'express';
-import { createReview, getAllReviews, getAllTags } from './reviews.controller';
+import {
+  createReview,
+  getAllReviews,
+  getAllTags,
+  updateReview,
+} from './reviews.controller';
 import {
   validate,
   validateParams,
@@ -9,6 +14,8 @@ import {
   createReviewSchema,
   getReviewsQuerySchema,
   resourceIdSchema,
+  reviewIdParamSchema,
+  updateReviewSchema,
 } from './reviews.schema';
 import { verifyToken } from '../auth/auth.middleware';
 
@@ -30,6 +37,14 @@ router.get(
   validateQuery(getReviewsQuerySchema),
   validateParams(resourceIdSchema),
   getAllReviews
+);
+
+router.patch(
+  '/:reviewId',
+  verifyToken,
+  validateParams(reviewIdParamSchema),
+  validate(updateReviewSchema),
+  updateReview
 );
 
 export { tagsRouter };

@@ -2,10 +2,11 @@ import { and, asc, count, desc, eq, inArray } from 'drizzle-orm';
 import { db } from '../../db';
 import { resources, reviews, reviewTags, Tags, tags } from '../../db/schema';
 import { reviewData, ReviewWithTags } from './reviews.types';
-import { SortType } from './reviews.schema';
+import { SortType, UpdateReviewInput } from './reviews.schema';
 
 import {
   ConflictError,
+  ForbidenError,
   InternalError,
   NotFoundError,
   ValidationError,
@@ -142,5 +143,90 @@ export const reviewService = {
         totalPages,
       },
     };
+  },
+
+  async updateReview(params: {
+    reviewId: string;
+    userId: string;
+    data: UpdateReviewInput;
+  }) {
+    const { userId, reviewId, data } = params;
+
+    // find the review
+
+    const existingReview = await db.query.reviews.findFirst({
+      where: eq(reviews.id, reviewId),
+      with: {
+        reviewTags: {
+          with: {
+            tag: true,
+          },
+        },
+      },
+    });
+
+    if (!existingReview) {
+      throw new NotFoundError('Review does not exist');
+    }
+
+    // check for ownership
+
+    if (existingReview.userId !== userId) {
+      throw new ForbidenError('Review does not belongs to user');
+    }
+
+    // validate tagIds
+    const validTags = await db
+      .select()
+      .from(tags)
+      .where(inArray(tags.id, data.tagIds!));
+
+    if (validTags.length !== data.tagIds?.length) {
+      throw new ValidationError('Tags are not valid');
+    }
+
+    const updatedReview = await db.transaction(async (tx) => {
+      // update review
+
+      const [updatedReview] = await tx
+        .update(reviews)
+        .set({
+          reviewText: data.reviewText,
+          rating: data.rating,
+          updatedAt: new Date(),
+        })
+        .where(eq(reviews.id, reviewId))
+        .returning();
+
+      if (!updatedReview) {
+        throw new InternalError('Failed to create review');
+      }
+
+      if (data.tagIds) {
+        await tx.delete(reviewTags).where(eq(reviewTags.reviewId, reviewId));
+
+        await tx.insert(reviewTags).values(
+          data.tagIds.map((tagId) => ({
+            reviewId: reviewId,
+            tagId: tagId,
+          }))
+        );
+      }
+
+      const updatedReviewWithTags = await tx.query.reviews.findFirst({
+        where: eq(reviews.id, reviewId),
+        with: {
+          reviewTags: {
+            with: {
+              tag: true,
+            },
+          },
+        },
+      });
+
+      return updatedReviewWithTags;
+    });
+
+    return updatedReview;
   },
 };

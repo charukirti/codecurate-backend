@@ -3,7 +3,9 @@ import { reviewService } from './reviews.service';
 import {
   CreateReviewInput,
   ResourceId,
+  ReviewIdParams,
   ReviewsQueryInput,
+  UpdateReviewInput,
 } from './reviews.schema';
 import { UnauthorizedError } from '../../shared/errors';
 
@@ -80,6 +82,35 @@ export async function getAllReviews(
       message: 'Fetched all reviews successfully',
       reviews,
       pagination,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function updateReview(
+  req: Request<ReviewIdParams, {}, UpdateReviewInput>,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const userId = req.userId!;
+    const { reviewId } = req.params;
+    const { reviewText, rating, tagIds } = req.body;
+
+    const updatedReview = await reviewService.updateReview({
+      reviewId,
+      userId,
+      data: {
+        reviewText,
+        rating,
+        tagIds,
+      },
+    });
+
+    res.status(200).json({
+      message: 'Review updated successfully',
+      data: updatedReview,
     });
   } catch (error) {
     next(error);
