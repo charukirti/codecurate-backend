@@ -34,5 +34,15 @@ export const resourceIdSchema = z.object({
   resourceId: z.uuid({ error: 'Not a valid resourceId' }),
 });
 
+export const sort = z.enum(['newest', 'oldest', 'highest', 'lowest']);
+
+export const getReviewsQuerySchema = z.object({
+  page: z.coerce.number().int().optional().default(1),
+  limit: z.coerce.number().int().min(1).max(50).optional().default(10),
+  sort: sort.optional().default('newest'),
+});
+
 export type CreateReviewInput = z.infer<typeof createReviewSchema>;
 export type ResourceId = z.infer<typeof resourceIdSchema>;
+export type ReviewsQueryInput = z.infer<typeof getReviewsQuerySchema>;
+export type SortType = z.infer<typeof sort>;

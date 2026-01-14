@@ -1,6 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { reviewService } from './reviews.service';
-import { CreateReviewInput, ResourceId } from './reviews.schema';
+import {
+  CreateReviewInput,
+  ResourceId,
+  ReviewsQueryInput,
+} from './reviews.schema';
 import { UnauthorizedError } from '../../shared/errors';
 
 export async function getAllTags(
@@ -49,6 +53,33 @@ export async function createReview(
     res.status(201).json({
       message: 'Review has been added',
       data: createdReview,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getAllReviews(
+  req: Request<ResourceId, {}, {}>,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { resourceId } = req.params;
+
+    const { page, limit, sort } = req.query as unknown as ReviewsQueryInput;
+
+    const { reviews, pagination } = await reviewService.getAllReviews({
+      resourceId,
+      page,
+      limit,
+      sort,
+    });
+
+    res.status(200).json({
+      message: 'Fetched all reviews successfully',
+      reviews,
+      pagination,
     });
   } catch (error) {
     next(error);
