@@ -224,4 +224,22 @@ export const reviewService = {
 
     return updatedReview;
   },
+
+  async deleteReview(params: { reviewId: string; userId: string }) {
+    const { reviewId, userId } = params;
+
+    const existingReview = await db.query.reviews.findFirst({
+      where: eq(reviews.id, reviewId),
+    });
+
+    if (!existingReview) {
+      throw new NotFoundError('Review does not exist!');
+    }
+
+    if (existingReview.userId !== userId) {
+      throw new ForbidenError('Review does not belong to this user');
+    }
+
+    await db.delete(reviews).where(eq(reviews.id, reviewId));
+  },
 };

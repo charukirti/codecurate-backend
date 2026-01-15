@@ -116,3 +116,26 @@ export async function updateReview(
     next(error);
   }
 }
+
+export async function deleteReview(
+  req: Request<ReviewIdParams, {}, {}>,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const userId = req.userId!;
+
+    const { reviewId } = req.params;
+
+    await reviewService.deleteReview({
+      userId,
+      reviewId,
+    });
+
+    res.status(200).json({
+      message: 'Review deleted successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+}

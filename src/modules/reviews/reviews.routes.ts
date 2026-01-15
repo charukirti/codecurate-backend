@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   createReview,
+  deleteReview,
   getAllReviews,
   getAllTags,
   updateReview,
@@ -45,6 +46,13 @@ router.patch(
   validateParams(reviewIdParamSchema),
   validate(updateReviewSchema),
   updateReview
+);
+
+router.delete(
+  '/:reviewId',
+  verifyToken,
+  validateParams(reviewIdParamSchema),
+  deleteReview
 );
 
 export { tagsRouter };
