@@ -8,6 +8,7 @@ import {
   uuid,
   varchar,
   bigint,
+  decimal,
 } from 'drizzle-orm/pg-core';
 
 export const typeEnum = pgEnum('type', ['video', 'playlist']);
@@ -34,6 +35,9 @@ export const resources = pgTable('resources', {
   videoLang: varchar('video_lang', { length: 50 }).notNull(),
   codeLang: varchar('code_lang', { length: 50 }).notNull(),
   topic: varchar('video_topic', { length: 100 }).notNull(),
+  avgRating: decimal('avg_rating', { precision: 3, scale: 1 })
+    .default('0')
+    .notNull(),
 
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),

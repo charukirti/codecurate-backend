@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, inArray } from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, sql } from 'drizzle-orm';
 import { db } from '../../db';
 import { resources, reviews, reviewTags, Tags, tags } from '../../db/schema';
 import { reviewData, ReviewWithTags } from './reviews.types';
@@ -12,7 +12,29 @@ import {
   ValidationError,
 } from '../../shared/errors';
 
+type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
 export const reviewService = {
+  async _calculateAndUpdateRating(tx: Transaction, resourceId: string) {
+    const [result] = await tx
+      .select({
+        average: sql<string>`avg(${reviews.rating})`,
+      })
+      .from(reviews)
+      .where(eq(reviews.resourceId, resourceId));
+
+    const newAverage = result?.average
+      ? String(Number(result.average).toFixed(1))
+      : '0';
+
+    await tx
+      .update(resources)
+      .set({
+        avgRating: newAverage,
+      })
+      .where(eq(resources.id, resourceId));
+  },
+
   async getAllTags(): Promise<Tags[]> {
     const allTags = await db.select().from(tags);
     if (!allTags || allTags.length === 0) {
@@ -74,6 +96,8 @@ export const reviewService = {
           tagId: tagId,
         }))
       );
+
+      await this._calculateAndUpdateRating(tx, data.resourceId);
 
       const reviewWithTags = await tx.query.reviews.findFirst({
         where: eq(reviews.id, newReview.id),
@@ -148,9 +172,10 @@ export const reviewService = {
   async updateReview(params: {
     reviewId: string;
     userId: string;
+    resourceId: string;
     data: UpdateReviewInput;
   }) {
-    const { userId, reviewId, data } = params;
+    const { userId, resourceId, reviewId, data } = params;
 
     const existingReview = await db.query.reviews.findFirst({
       where: eq(reviews.id, reviewId),
@@ -208,6 +233,8 @@ export const reviewService = {
         );
       }
 
+      await this._calculateAndUpdateRating(tx, resourceId);
+
       const updatedReviewWithTags = await tx.query.reviews.findFirst({
         where: eq(reviews.id, reviewId),
         with: {
@@ -240,6 +267,9 @@ export const reviewService = {
       throw new ForbidenError('Review does not belong to this user');
     }
 
-    await db.delete(reviews).where(eq(reviews.id, reviewId));
+    await db.transaction(async (tx) => {
+      await db.delete(reviews).where(eq(reviews.id, reviewId));
+      await this._calculateAndUpdateRating(tx, existingReview.resourceId);
+    });
   },
 };

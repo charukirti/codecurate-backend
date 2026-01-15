@@ -95,12 +95,13 @@ export async function updateReview(
 ) {
   try {
     const userId = req.userId!;
-    const { reviewId } = req.params;
     const { reviewText, rating, tagIds } = req.body;
+    const { resourceId, reviewId } = req.params;
 
     const updatedReview = await reviewService.updateReview({
       reviewId,
       userId,
+      resourceId,
       data: {
         reviewText,
         rating,

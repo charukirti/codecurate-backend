@@ -44,6 +44,7 @@ export const getReviewsQuerySchema = z.object({
 
 export const reviewIdParamSchema = z.object({
   reviewId: z.uuid({ error: 'This is not a valid review id' }),
+  resourceId: z.uuid({ error: 'This is not a valid resource id' }),
 });
 
 export const updateReviewSchema = z.object({
