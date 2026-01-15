@@ -1,0 +1,1 @@
+ALTER TABLE "resources" ADD COLUMN "avg_rating" numeric(3, 1) DEFAULT '0' NOT NULL;
