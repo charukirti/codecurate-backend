@@ -152,8 +152,6 @@ export const reviewService = {
   }) {
     const { userId, reviewId, data } = params;
 
-    // find the review
-
     const existingReview = await db.query.reviews.findFirst({
       where: eq(reviews.id, reviewId),
       with: {
@@ -169,25 +167,22 @@ export const reviewService = {
       throw new NotFoundError('Review does not exist');
     }
 
-    // check for ownership
-
     if (existingReview.userId !== userId) {
-      throw new ForbidenError('Review does not belongs to user');
+      throw new ForbidenError('Review does not belong to this user');
     }
 
-    // validate tagIds
-    const validTags = await db
-      .select()
-      .from(tags)
-      .where(inArray(tags.id, data.tagIds!));
+    if (data.tagIds) {
+      const validTags = await db
+        .select()
+        .from(tags)
+        .where(inArray(tags.id, data.tagIds));
 
-    if (validTags.length !== data.tagIds?.length) {
-      throw new ValidationError('Tags are not valid');
+      if (validTags.length !== data.tagIds.length) {
+        throw new ValidationError('Tags are not valid');
+      }
     }
 
     const updatedReview = await db.transaction(async (tx) => {
-      // update review
-
       const [updatedReview] = await tx
         .update(reviews)
         .set({
