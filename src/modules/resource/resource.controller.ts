@@ -3,7 +3,7 @@ import { createResourceInput, getResourcesQuery } from './resource.schema';
 import { extractVideoUrl } from '../../utils/extractVideoUrl';
 import { youtubeApiService } from './youtubeapi.service';
 import { resourceService } from './resource.service';
-import { InvalidCredentialError, ValidationError } from '../../shared/errors';
+import { ValidationError } from '../../shared/errors';
 
 export async function createResource(
   req: Request<{}, {}, createResourceInput>,
