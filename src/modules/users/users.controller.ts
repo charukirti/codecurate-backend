@@ -14,7 +14,7 @@ export async function getProfile(
 
     res.status(200).json({
       message: 'user data retrived successfully',
-      user,
+      data: user,
     });
   } catch (error) {
     next(error);
@@ -34,7 +34,7 @@ export async function updateProfile(
 
     res.status(200).json({
       message: 'User updated successfully',
-      user,
+      data: user,
     });
   } catch (error) {
     next(error);

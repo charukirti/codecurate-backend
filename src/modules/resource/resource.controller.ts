@@ -3,6 +3,7 @@ import { createResourceInput, getResourcesQuery } from './resource.schema';
 import { extractVideoUrl } from '../../utils/extractVideoUrl';
 import { youtubeApiService } from './youtubeapi.service';
 import { resourceService } from './resource.service';
+import { InvalidCredentialError } from '../../shared/errors';
 
 export async function createResource(
   req: Request<{}, {}, createResourceInput>,
@@ -97,7 +98,11 @@ export async function getResource(
   try {
     const { id } = req.params;
 
-    const resource = await resourceService.getResourceById(id!);
+    if (!id) {
+      throw new InvalidCredentialError('Inavlid ID params');
+    }
+
+    const resource = await resourceService.getResourceById(id);
 
     res.status(200).json({
       message: 'Fetched resource successfully',

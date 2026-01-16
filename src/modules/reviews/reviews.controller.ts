@@ -80,8 +80,10 @@ export async function getAllReviews(
 
     res.status(200).json({
       message: 'Fetched all reviews successfully',
-      reviews,
-      pagination,
+      data: {
+        reviews,
+        pagination,
+      },
     });
   } catch (error) {
     next(error);

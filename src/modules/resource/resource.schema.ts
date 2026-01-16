@@ -79,7 +79,7 @@ export const getResourcesQuerySchema = z.object({
     .transform((val) => parseInt(val, 10))
     .pipe(z.number().min(1))
     .optional()
-    .default(10),
+    .default(1),
   limit: z
     .string()
     .transform((val) => parseInt(val, 10))

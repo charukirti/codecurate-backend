@@ -268,7 +268,7 @@ export const reviewService = {
     }
 
     await db.transaction(async (tx) => {
-      await db.delete(reviews).where(eq(reviews.id, reviewId));
+      await tx.delete(reviews).where(eq(reviews.id, reviewId));
       await this._calculateAndUpdateRating(tx, existingReview.resourceId);
     });
   },

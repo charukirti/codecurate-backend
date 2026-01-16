@@ -14,7 +14,7 @@ export async function signUp(
 
     res.status(201).json({
       message: 'User created successfully',
-      user: user,
+      data: user,
     });
   } catch (error) {
     next(error);
@@ -40,7 +40,7 @@ export async function signIn(
 
     res.status(200).json({
       message: 'User signed in successfully',
-      user: userData,
+      data: userData,
       accessToken,
     });
   } catch (error) {
