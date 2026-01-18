@@ -57,7 +57,7 @@ export class UnauthorizedError extends AppError {
 
 /** 403 Forbiden - Logged in but user has no permission */
 
-export class ForbidenError extends AppError {
+export class ForbiddenError extends AppError {
   constructor(message: string = 'Access denied') {
     super(message, 403, 'FORBIDDEN');
   }

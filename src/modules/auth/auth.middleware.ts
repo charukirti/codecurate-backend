@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { ForbidenError, UnauthorizedError } from '../../shared/errors';
+import { ForbiddenError, UnauthorizedError } from '../../shared/errors';
 import jwt from 'jsonwebtoken';
 import authConfig from '../../config/auth.config';
 
@@ -49,7 +49,7 @@ export function requireAdmin(
   next: NextFunction
 ): void {
   if (req.role !== 'admin') {
-    return next(new ForbidenError('Only admin can access this route'));
+    return next(new ForbiddenError('Only admin can access this route'));
   }
   next();
 }

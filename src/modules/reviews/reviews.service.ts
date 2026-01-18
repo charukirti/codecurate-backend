@@ -6,7 +6,7 @@ import { SortType, UpdateReviewInput } from './reviews.schema';
 
 import {
   ConflictError,
-  ForbidenError,
+  ForbiddenError,
   InternalError,
   NotFoundError,
   ValidationError,
@@ -193,7 +193,7 @@ export const reviewService = {
     }
 
     if (existingReview.userId !== userId) {
-      throw new ForbidenError('Review does not belong to this user');
+      throw new ForbiddenError('Review does not belong to this user');
     }
 
     if (data.tagIds) {
@@ -264,7 +264,7 @@ export const reviewService = {
     }
 
     if (existingReview.userId !== userId) {
-      throw new ForbidenError('Review does not belong to this user');
+      throw new ForbiddenError('Review does not belong to this user');
     }
 
     await db.transaction(async (tx) => {
