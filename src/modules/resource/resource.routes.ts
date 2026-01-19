@@ -1,10 +1,5 @@
 import { Router } from 'express';
-import {
-  validate,
-  validateParams,
-  validateQuery,
-} from '../../middlewares/validate';
-
+import { validate } from '../../middlewares/validate';
 import reviewRoutes from '../reviews/reviews.routes';
 
 import {
@@ -26,21 +21,21 @@ router.post(
   '/',
   verifyToken,
   requireAdmin,
-  validate(createResourceSchema),
+  validate({ body: createResourceSchema }),
   createResource
 );
-router.get('/', validateQuery(getResourcesQuerySchema), getAllResources);
+router.get('/', validate({ query: getResourcesQuerySchema }), getAllResources);
 router.get(
   '/:id',
   verifyToken,
-  validateParams(getResourceParamSchema),
+  validate({ params: getResourceParamSchema }),
   getResource
 );
 router.delete(
   '/:id',
   verifyToken,
   requireAdmin,
-  validateParams(getResourceParamSchema),
+  validate({ params: getResourceParamSchema }),
   deleteResource
 );
 

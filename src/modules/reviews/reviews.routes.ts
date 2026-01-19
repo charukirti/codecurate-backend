@@ -6,11 +6,7 @@ import {
   getAllTags,
   updateReview,
 } from './reviews.controller';
-import {
-  validate,
-  validateParams,
-  validateQuery,
-} from '../../middlewares/validate';
+import { validate } from '../../middlewares/validate';
 import {
   createReviewSchema,
   getReviewsQuerySchema,
@@ -28,30 +24,30 @@ tagsRouter.get('/', getAllTags);
 router.post(
   '/',
   verifyToken,
-  validate(createReviewSchema),
-  validateParams(resourceIdSchema),
+  validate({ body: createReviewSchema }),
+  validate({ params: resourceIdSchema }),
   createReview
 );
 
 router.get(
   '/',
-  validateQuery(getReviewsQuerySchema),
-  validateParams(resourceIdSchema),
+  validate({ query: getReviewsQuerySchema }),
+  validate({ params: resourceIdSchema }),
   getAllReviews
 );
 
 router.patch(
   '/:reviewId',
   verifyToken,
-  validateParams(reviewIdParamSchema),
-  validate(updateReviewSchema),
+  validate({ params: reviewIdParamSchema }),
+  validate({ body: updateReviewSchema }),
   updateReview
 );
 
 router.delete(
   '/:reviewId',
   verifyToken,
-  validateParams(reviewIdParamSchema),
+  validate({ params: reviewIdParamSchema }),
   deleteReview
 );
 

@@ -6,8 +6,8 @@ import { verifyToken } from './auth.middleware';
 
 const router = Router();
 
-router.post('/signup', validate(signUpSchema), signUp);
-router.post('/signin', validate(signInSchema), signIn);
+router.post('/signup', validate({ body: signUpSchema }), signUp);
+router.post('/signin', validate({ body: signInSchema }), signIn);
 router.post('/signout', verifyToken, signOut);
 router.post('/refresh-token', refreshToken);
 
