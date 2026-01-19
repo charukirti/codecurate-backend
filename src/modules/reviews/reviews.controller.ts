@@ -96,7 +96,12 @@ export async function updateReview(
   next: NextFunction
 ) {
   try {
-    const userId = req.userId!;
+    const userId = req.userId;
+
+    if (!userId) {
+      throw new UnauthorizedError('User not authenticated');
+    }
+
     const { reviewText, rating, tagIds } = req.body;
     const { resourceId, reviewId } = req.params;
 
@@ -126,7 +131,11 @@ export async function deleteReview(
   next: NextFunction
 ) {
   try {
-    const userId = req.userId!;
+    const userId = req.userId;
+
+    if (!userId) {
+      throw new UnauthorizedError('User not authenticated');
+    }
 
     const { reviewId } = req.params;
 

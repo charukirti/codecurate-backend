@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { userService } from './users.service';
 import { UpdateUserInput } from './users.schema';
+import { UnauthorizedError } from '../../shared/errors';
 
 export async function getProfile(
   req: Request,
@@ -10,7 +11,11 @@ export async function getProfile(
   try {
     const userId = req.userId;
 
-    const user = await userService.getProfile(userId!);
+    if (!userId) {
+      throw new UnauthorizedError('User not authenticated');
+    }
+
+    const user = await userService.getProfile(userId);
 
     res.status(200).json({
       message: 'user data retrived successfully',
@@ -27,7 +32,12 @@ export async function updateProfile(
   next: NextFunction
 ) {
   try {
-    const userId = req.userId!;
+    const userId = req.userId;
+
+    if (!userId) {
+      throw new UnauthorizedError('User not authenticated');
+    }
+
     const data = req.body;
 
     const user = await userService.updateProfile(userId, data);

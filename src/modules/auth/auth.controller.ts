@@ -51,7 +51,11 @@ export async function signIn(
 export async function signOut(req: Request, res: Response, next: NextFunction) {
   try {
     const userId = req.userId;
-    await authService.signOut(userId!);
+
+    if (!userId) {
+      throw new UnauthorizedError('User not authenticated');
+    }
+    await authService.signOut(userId);
 
     res.clearCookie('refreshToken');
 

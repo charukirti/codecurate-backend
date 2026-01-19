@@ -123,7 +123,6 @@ export const reviewService = {
     sort: SortType;
   }) {
     const { resourceId, page, limit, sort } = params;
-    // calculate offset
 
     const offset = (page - 1) * limit;
 
