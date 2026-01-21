@@ -15,7 +15,17 @@ import {
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 export const reviewService = {
-  async _calculateAndUpdateRating(tx: Transaction, resourceId: string) {
+  /**
+   * Calculates the average rating and updates the resource table column
+   * @param tx - database transaction
+   * @param resourceId - resource id of the resource whose average rating is being calculated
+   * @returns {Promise<void>}
+   */
+
+  async _calculateAndUpdateRating(
+    tx: Transaction,
+    resourceId: string
+  ): Promise<void> {
     const [result] = await tx
       .select({
         average: sql<string>`avg(${reviews.rating})`,
@@ -35,6 +45,12 @@ export const reviewService = {
       .where(eq(resources.id, resourceId));
   },
 
+  /**
+   * Retrieves all tags from the database
+   * @returns {Promise<Tags[]>} array of all tags
+   * @throws {NotFoundError} if no tags exist
+   */
+
   async getAllTags(): Promise<Tags[]> {
     const allTags = await db.select().from(tags);
     if (!allTags || allTags.length === 0) {
@@ -42,6 +58,16 @@ export const reviewService = {
     }
     return allTags;
   },
+
+  /**
+   * Creates a new review with user selected tags for a resource
+   * @param data - review data object containing userId, resourceId, rating, reviewText, and tagIds
+   * @returns {Promise<ReviewWithTags | undefined>} created review with user selected tags
+   * @throws {NotFoundError} if resource is not found
+   * @throws {ConflictError} if review already exists for user and resource
+   * @throws {ValidationError} if tags are not valid
+   * @throws {InternalError} if review creation fails
+   */
 
   async createReview(data: reviewData): Promise<ReviewWithTags | undefined> {
     const { userId, resourceId, rating, reviewText, tagIds } = data;
@@ -116,12 +142,18 @@ export const reviewService = {
     return createdReview;
   },
 
+  /**
+   * Retrieves paginated reviews for a resource with sorting options
+   * @param params - object containing resourceId, page, limit, and sort type
+   * @returns {Promise<object>} paginated reviews with user info and tags, plus pagination metadata
+   */
+
   async getAllReviews(params: {
     resourceId: string;
     page: number;
     limit: number;
     sort: SortType;
-  }) {
+  }): Promise<object> {
     const { resourceId, page, limit, sort } = params;
 
     const offset = (page - 1) * limit;
@@ -168,12 +200,22 @@ export const reviewService = {
     };
   },
 
+  /**
+   * Updates an existing review and recalculates average rating
+   * @param params - object containing reviewId, userId, resourceId, and data to update
+   * @returns {Promise<ReviewWithTags | undefined>} updated review with tags
+   * @throws {NotFoundError} if review does not exist
+   * @throws {ForbiddenError} if review does not belong to current user
+   * @throws {ValidationError} if tags are not valid
+   * @throws {InternalError} if review update fails
+   */
+
   async updateReview(params: {
     reviewId: string;
     userId: string;
     resourceId: string;
     data: UpdateReviewInput;
-  }) {
+  }): Promise<ReviewWithTags | undefined> {
     const { userId, resourceId, reviewId, data } = params;
 
     const existingReview = await db.query.reviews.findFirst({
@@ -251,7 +293,18 @@ export const reviewService = {
     return updatedReview;
   },
 
-  async deleteReview(params: { reviewId: string; userId: string }) {
+  /**
+   * Deletes a review for the user and recalculates average rating
+   * @param params - object containing reviewId and userId
+   * @returns {Promise<void>}
+   * @throws {NotFoundError} if review does not exist
+   * @throws {ForbiddenError} if review does not belong to current user
+   */
+
+  async deleteReview(params: {
+    reviewId: string;
+    userId: string;
+  }): Promise<void> {
     const { reviewId, userId } = params;
 
     const existingReview = await db.query.reviews.findFirst({

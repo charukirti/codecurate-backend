@@ -1,11 +1,10 @@
 # Some refactors
 
-- [] Validation middleware 
-    - merge three different schema validation middleware into one 
+- [✅] Validation middleware : merge three different schema validation middleware into one 
 
 - [✅] Fix typo in error classes and messages
 - [✅] Remove Non-null assertions and add proper validations
-- [] Add JSDoc style comments where necessary
+- [✅] Add JSDoc style comments where necessary
 
 # Security Related
 

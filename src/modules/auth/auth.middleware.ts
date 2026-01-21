@@ -3,6 +3,14 @@ import { ForbiddenError, UnauthorizedError } from '../../shared/errors';
 import jwt from 'jsonwebtoken';
 import authConfig from '../../config/auth.config';
 
+/**
+ * Middleware to validate JWT token for authenticated users
+ * @param req - Express request object containing authorization header
+ * @param res - Express response object
+ * @param next - Express next middleware function
+ * @throws {UnauthorizedError} if token is missing, invalid, or expired
+ */
+
 export function verifyToken(
   req: Request,
   res: Response,
@@ -42,6 +50,14 @@ export function verifyToken(
     next(error);
   }
 }
+
+/**
+ * Middleware to verify authenticated user has admin role
+ * @param req - Express request object with user role from token
+ * @param res - Express response object
+ * @param next - Express next middleware function
+ * @throws {ForbiddenError} if user is not an admin
+ */
 
 export function requireAdmin(
   req: Request,
