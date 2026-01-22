@@ -1,4 +1,4 @@
-import { Reviews, ReviewTag, Tags } from '../../db/schema';
+import { Reviews, Tags, User } from '../../db/schema';
 
 export type reviewData = {
   userId: string;
@@ -8,6 +8,17 @@ export type reviewData = {
   tagIds: string[];
 };
 
-export type ReviewWithTags = Reviews & {
-  reviewTags: (ReviewTag & { tag: Tags })[];
+export type ReviewResponse = Reviews & {
+  user: Pick<User, 'id' | 'username'>;
+  tags: Tags[];
+};
+
+export type PaginatedReviewsResponse = {
+  reviews: ReviewResponse[];
+  pagination: {
+    page: number;
+    limit: number;
+    totalItems: number;
+    totalPages: number;
+  };
 };

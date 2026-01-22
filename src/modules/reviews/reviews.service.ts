@@ -1,7 +1,11 @@
 import { and, asc, count, desc, eq, inArray, sql } from 'drizzle-orm';
 import { db } from '../../db';
 import { resources, reviews, reviewTags, Tags, tags } from '../../db/schema';
-import { reviewData, ReviewWithTags } from './reviews.types';
+import {
+  PaginatedReviewsResponse,
+  reviewData,
+  ReviewResponse,
+} from './reviews.types';
 import { SortType, UpdateReviewInput } from './reviews.schema';
 
 import {
@@ -62,14 +66,14 @@ export const reviewService = {
   /**
    * Creates a new review with user selected tags for a resource
    * @param data - review data object containing userId, resourceId, rating, reviewText, and tagIds
-   * @returns {Promise<ReviewWithTags | undefined>} created review with user selected tags
+   * @returns {Promise<ReviewResponse | undefined>} created review with user selected tags
    * @throws {NotFoundError} if resource is not found
    * @throws {ConflictError} if review already exists for user and resource
    * @throws {ValidationError} if tags are not valid
    * @throws {InternalError} if review creation fails
    */
 
-  async createReview(data: reviewData): Promise<ReviewWithTags | undefined> {
+  async createReview(data: reviewData): Promise<ReviewResponse | undefined> {
     const { userId, resourceId, rating, reviewText, tagIds } = data;
 
     const [existingResource] = await db
@@ -128,6 +132,10 @@ export const reviewService = {
       const reviewWithTags = await tx.query.reviews.findFirst({
         where: eq(reviews.id, newReview.id),
         with: {
+          user: {
+            columns: { id: true, username: true },
+          },
+
           reviewTags: {
             with: {
               tag: true,
@@ -136,7 +144,15 @@ export const reviewService = {
         },
       });
 
-      return reviewWithTags;
+      if (!reviewWithTags) {
+        throw new InternalError('Failed to fetch the created review');
+      }
+
+      return {
+        ...reviewWithTags,
+        reviewTags: undefined,
+        tags: reviewWithTags?.reviewTags.map((rt) => rt.tag),
+      };
     });
 
     return createdReview;
@@ -145,7 +161,7 @@ export const reviewService = {
   /**
    * Retrieves paginated reviews for a resource with sorting options
    * @param params - object containing resourceId, page, limit, and sort type
-   * @returns {Promise<object>} paginated reviews with user info and tags, plus pagination metadata
+   * @returns {Promise<PaginatedReviewsResponse>} paginated reviews with user info and tags, plus pagination metadata
    */
 
   async getAllReviews(params: {
@@ -153,7 +169,7 @@ export const reviewService = {
     page: number;
     limit: number;
     sort: SortType;
-  }): Promise<object> {
+  }): Promise<PaginatedReviewsResponse> {
     const { resourceId, page, limit, sort } = params;
 
     const offset = (page - 1) * limit;
@@ -180,6 +196,12 @@ export const reviewService = {
       },
     });
 
+    const reviewsWithTags = allReviews.map((review) => ({
+      ...review,
+      reviewTags: undefined,
+      tags: review.reviewTags.map((rt) => rt.tag),
+    }));
+
     const [countResult] = await db
       .select({ count: count() })
       .from(reviews)
@@ -190,7 +212,7 @@ export const reviewService = {
     const totalPages = Math.ceil(totalItems / limit);
 
     return {
-      reviews: allReviews,
+      reviews: reviewsWithTags,
       pagination: {
         page,
         limit,
@@ -215,7 +237,7 @@ export const reviewService = {
     userId: string;
     resourceId: string;
     data: UpdateReviewInput;
-  }): Promise<ReviewWithTags | undefined> {
+  }): Promise<ReviewResponse | undefined> {
     const { userId, resourceId, reviewId, data } = params;
 
     const existingReview = await db.query.reviews.findFirst({
@@ -279,6 +301,12 @@ export const reviewService = {
       const updatedReviewWithTags = await tx.query.reviews.findFirst({
         where: eq(reviews.id, reviewId),
         with: {
+          user: {
+            columns: {
+              id: true,
+              username: true,
+            },
+          },
           reviewTags: {
             with: {
               tag: true,
@@ -287,7 +315,15 @@ export const reviewService = {
         },
       });
 
-      return updatedReviewWithTags;
+      if (!updatedReviewWithTags) {
+        throw new InternalError('Failed to fetch the created review');
+      }
+
+      return {
+        ...updatedReviewWithTags,
+        reviewTags: undefined,
+        tags: updatedReviewWithTags?.reviewTags.map((rt) => rt.tag),
+      };
     });
 
     return updatedReview;
