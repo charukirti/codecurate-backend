@@ -80,20 +80,23 @@ export const resourceService = {
    */
 
   async createResource(data: NewResource): Promise<Resource> {
+    const conditions = [];
+
+    if (data.videoId) {
+      conditions.push(eq(resources.videoId, data.videoId));
+    }
+    if (data.playlistId) {
+      conditions.push(eq(resources.playlistId, data.playlistId));
+    }
+
     const [existingResource] = await db
       .select()
       .from(resources)
-      .where(
-        or(
-          eq(resources.videoId, data.videoId!),
-          eq(resources.playlistId, data.playlistId!)
-        )
-      );
+      .where(or(...conditions));
 
     if (existingResource) {
-      throw new ConflictError(
-        `${data.videoId && 'Video already exist'} ${data.playlistId && 'Playlist already exist'}`
-      );
+      const resourceType = data.type === 'video' ? 'Video' : 'Playlist';
+      throw new ConflictError(`${resourceType} already exists`);
     }
 
     const [newResource] = await db.insert(resources).values(data).returning();

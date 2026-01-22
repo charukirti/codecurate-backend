@@ -5,21 +5,26 @@ import {
   timestamp,
   text,
   pgEnum,
+  index,
 } from 'drizzle-orm/pg-core';
 
 export const roleEnum = pgEnum('role_enum', ['user', 'admin']);
 
-export const users = pgTable('users', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  name: varchar('name', { length: 255 }).notNull(),
-  username: varchar('username', { length: 100 }).notNull().unique(),
-  email: varchar('email', { length: 255 }).notNull().unique(),
-  password: varchar('password', { length: 255 }).notNull(),
-  role: roleEnum('role').default('user').notNull(),
-  refreshToken: text('refresh_token'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
-});
+export const users = pgTable(
+  'users',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    name: varchar('name', { length: 255 }).notNull(),
+    username: varchar('username', { length: 100 }).notNull().unique(),
+    email: varchar('email', { length: 255 }).notNull().unique(),
+    password: varchar('password', { length: 255 }).notNull(),
+    role: roleEnum('role').default('user').notNull(),
+    refreshToken: text('refresh_token'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => [index('idx_users_email').on(table.email)]
+);
 
 // type for data coming out of database after querying
 export type User = typeof users.$inferSelect;
