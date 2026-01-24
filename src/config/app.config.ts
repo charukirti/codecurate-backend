@@ -6,6 +6,9 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production']).default('development'),
   DATABASE_URL: z.string().min(1, 'Database connection string is missing'),
   YT_API_KEY: z.string().min(1, 'Youtube api key required').optional(),
+  CLIENT_URL: z
+    .url({ error: 'Invalid url format' })
+    .default('http://localhost:3000'),
 });
 
 function validateEnv() {
@@ -25,6 +28,7 @@ const appConfig = {
   node_env: env.NODE_ENV,
   yt_api_key: env.YT_API_KEY,
   db_url: env.DATABASE_URL,
+  client_url: env.CLIENT_URL,
 };
 
 export default appConfig;
