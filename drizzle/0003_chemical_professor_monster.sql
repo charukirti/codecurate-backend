@@ -1,0 +1,1 @@
+ALTER TABLE "resources" ADD COLUMN "instructor_name" varchar(255) DEFAULT '' NOT NULL;

@@ -30,6 +30,7 @@ export const resources = pgTable(
     publishedAt: timestamp('published_at').notNull(),
     thumbnails: jsonb('thumbnails').notNull(),
     itemCount: integer('item_count'),
+    instructorName: varchar('instructor_name', { length: 255 }).notNull(),
 
     durationSeconds: integer('duration_seconds'),
     viewCount: bigint('view_count', { mode: 'number' }),
