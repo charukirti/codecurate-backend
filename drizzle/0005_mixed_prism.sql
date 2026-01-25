@@ -1,0 +1,1 @@
+ALTER TABLE "resources" ALTER COLUMN "code_lang" DROP NOT NULL;

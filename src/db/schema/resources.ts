@@ -37,7 +37,7 @@ export const resources = pgTable(
     likeCount: bigint('like_count', { mode: 'number' }),
 
     videoLang: varchar('video_lang', { length: 50 }).notNull(),
-    codeLang: varchar('code_lang', { length: 50 }).notNull(),
+    codeLang: varchar('code_lang', { length: 50 }),
     topic: varchar('video_topic', { length: 100 }).notNull(),
     avgRating: decimal('avg_rating', { precision: 3, scale: 1 })
       .default('0')
