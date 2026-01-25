@@ -26,10 +26,11 @@ export const resourceService = {
   prepareVideoData(
     youtubeData: VideoAPIResponse,
     videoLang: string,
-    codeLang: string,
+    codeLang: string | undefined,
     topic: string,
     resourceType: 'video' | 'playlist',
-    videoId: string
+    videoId: string,
+    instructorName: string
   ): NewResource {
     return {
       ...youtubeData,
@@ -38,6 +39,7 @@ export const resourceService = {
       topic: topic,
       type: resourceType,
       videoId: videoId,
+      instructorName: instructorName || youtubeData.channelName,
     };
   },
 
@@ -54,10 +56,11 @@ export const resourceService = {
   preparePlaylistResource(
     youtubeData: PlaylistAPIResponse,
     playlistId: string,
-    codeLang: string,
+    codeLang: string | undefined,
     topic: string,
     videoLang: string,
-    resourceType: 'video' | 'playlist'
+    resourceType: 'video' | 'playlist',
+    instructorName: string
   ): NewResource {
     return {
       ...youtubeData,
@@ -67,6 +70,7 @@ export const resourceService = {
       codeLang: codeLang,
       topic: topic,
       type: resourceType,
+      instructorName: instructorName || youtubeData.channelName,
     };
   },
 

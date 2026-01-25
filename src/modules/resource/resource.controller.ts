@@ -11,7 +11,8 @@ export async function createResource(
   next: NextFunction
 ) {
   try {
-    const { url, codeLang, videoLang, topic, resourceType } = req.body;
+    const { url, codeLang, videoLang, topic, resourceType, instructorName } =
+      req.body;
 
     const { videoId, playlistId } = extractVideoUrl(url);
 
@@ -19,28 +20,30 @@ export async function createResource(
     let savedResource;
 
     if (videoId) {
-      youtubeData = await youtubeApiService.getVideoDetails(videoId!);
+      youtubeData = await youtubeApiService.getVideoDetails(videoId);
 
       const resourceData = resourceService.prepareVideoData(
         youtubeData,
-        videoLang!,
+        videoLang,
         codeLang,
         topic,
         resourceType,
-        videoId
+        videoId,
+        instructorName
       );
 
       savedResource = await resourceService.createResource(resourceData);
-    } else {
-      youtubeData = await youtubeApiService.getPlaylistDetails(playlistId!);
+    } else if (playlistId) {
+      youtubeData = await youtubeApiService.getPlaylistDetails(playlistId);
 
       const resourceData = resourceService.preparePlaylistResource(
         youtubeData,
-        playlistId!,
+        playlistId,
         codeLang,
         topic,
-        videoLang!,
-        resourceType
+        videoLang,
+        resourceType,
+        instructorName
       );
 
       savedResource = await resourceService.createResource(resourceData);

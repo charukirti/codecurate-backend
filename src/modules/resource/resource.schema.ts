@@ -16,25 +16,27 @@ export const createResourceSchema = z.object({
     { error: 'URL must be in valid format' }
   ),
 
-  codeLang: z.enum(
-    [
-      'HTML',
-      'CSS',
-      'JavaScript',
-      'Tailwind',
-      'React',
-      'TypeScript',
-      'Node.js',
-      'Go',
-      'Python',
-      'Rust',
-      'Java',
-      'C',
-      'C++',
-      'C#',
-    ],
-    { error: 'Select correct coding language' }
-  ),
+  codeLang: z
+    .enum(
+      [
+        'HTML',
+        'CSS',
+        'JavaScript',
+        'Tailwind',
+        'React',
+        'TypeScript',
+        'Node.js',
+        'Go',
+        'Python',
+        'Rust',
+        'Java',
+        'C',
+        'C++',
+        'C#',
+      ],
+      { error: 'Select correct coding language' }
+    )
+    .optional(),
 
   topic: z
     .string()
@@ -48,8 +50,12 @@ export const createResourceSchema = z.object({
   videoLang: z
     .string()
     .min(2, 'Language of the video must be at least 2 characters')
-    .max(100, 'Language of the video must be at most 100 characters')
-    .optional(),
+    .max(100, 'Language of the video must be at most 100 characters'),
+
+  instructorName: z
+    .string()
+    .min(2, 'Instructor name must be at least 2 characters')
+    .max(100, 'Instructor name must be at most 255 characters'),
 });
 
 export const getResourcesQuerySchema = z.object({
