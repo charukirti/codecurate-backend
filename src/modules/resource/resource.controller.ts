@@ -11,8 +11,15 @@ export async function createResource(
   next: NextFunction
 ) {
   try {
-    const { url, codeLang, videoLang, topic, resourceType, instructorName } =
-      req.body;
+    const {
+      url,
+      codeLang,
+      videoLang,
+      topic,
+      resourceType,
+      instructorName,
+      description,
+    } = req.body;
 
     const { videoId, playlistId } = extractVideoUrl(url);
 
@@ -25,11 +32,12 @@ export async function createResource(
       const resourceData = resourceService.prepareVideoData(
         youtubeData,
         videoLang,
-        codeLang,
         topic,
         resourceType,
         videoId,
-        instructorName
+        instructorName,
+        codeLang,
+        description
       );
 
       savedResource = await resourceService.createResource(resourceData);
@@ -39,11 +47,12 @@ export async function createResource(
       const resourceData = resourceService.preparePlaylistResource(
         youtubeData,
         playlistId,
-        codeLang,
         topic,
         videoLang,
         resourceType,
-        instructorName
+        instructorName,
+        codeLang,
+        description
       );
 
       savedResource = await resourceService.createResource(resourceData);

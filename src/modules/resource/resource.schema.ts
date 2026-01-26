@@ -56,6 +56,12 @@ export const createResourceSchema = z.object({
     .string()
     .min(2, 'Instructor name must be at least 2 characters')
     .max(100, 'Instructor name must be at most 255 characters'),
+
+  description: z
+    .string()
+    .min(20, 'Description must be at least 20 characters')
+    .max(600, 'Description must be at most 600 characters')
+    .optional(),
 });
 
 export const getResourcesQuerySchema = z.object({

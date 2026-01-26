@@ -12,7 +12,7 @@ type Thumbnail = {
 export type VideoAPIResponse = {
   title: string;
   publishedAt: Date;
-  description: string;
+  rawDescription: string;
   channelId: string;
   channelName: string;
   thumbnails: {
@@ -32,7 +32,7 @@ export type PlaylistAPIResponse = {
   publishedAt: Date;
   title: string;
   channelId: string;
-  description: string;
+  rawDescription: string;
   thumbnails: {
     default: Thumbnail;
     medium: Thumbnail;

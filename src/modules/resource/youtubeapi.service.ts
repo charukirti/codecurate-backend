@@ -34,7 +34,7 @@ export const youtubeApiService = {
 
     return {
       title: snippet.title,
-      description: snippet.description,
+      rawDescription: snippet.description,
       channelId: snippet.channelId,
       publishedAt: new Date(snippet.publishedAt),
       channelName: snippet.channelTitle,
@@ -70,7 +70,7 @@ export const youtubeApiService = {
       channelId: snippet.channelId,
       channelName: snippet.channelTitle,
       title: snippet.title,
-      description: snippet.description,
+      rawDescription: snippet.description,
       thumbnails: snippet.thumbnails,
       itemCount: content.itemCount,
       publishedAt: new Date(snippet.publishedAt),

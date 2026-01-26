@@ -24,7 +24,8 @@ export const resources = pgTable(
     playlistId: varchar('playlist_id', { length: 100 }).unique(),
 
     title: varchar('video_title', { length: 255 }).notNull(),
-    description: text('video_description'),
+    rawDescription: text('raw_description'),
+    description: text('description'),
     channelId: varchar('channel_id', { length: 100 }),
     channelName: varchar('channel_name', { length: 255 }).notNull(),
     publishedAt: timestamp('published_at').notNull(),

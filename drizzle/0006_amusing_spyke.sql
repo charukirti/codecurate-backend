@@ -1,0 +1,1 @@
+ALTER TABLE "resources" RENAME COLUMN "video_description" TO "raw_description";
