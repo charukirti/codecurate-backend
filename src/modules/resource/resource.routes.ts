@@ -11,6 +11,7 @@ import {
   createResource,
   deleteResource,
   getAllResources,
+  getRelatedResources,
   getResource,
 } from './resource.controller';
 import { requireAdmin, verifyToken } from '../auth/auth.middleware';
@@ -25,11 +26,11 @@ router.post(
   createResource
 );
 router.get('/', validate({ query: getResourcesQuerySchema }), getAllResources);
+router.get('/:id', validate({ params: getResourceParamSchema }), getResource);
 router.get(
-  '/:id',
-  verifyToken,
+  '/:id/related',
   validate({ params: getResourceParamSchema }),
-  getResource
+  getRelatedResources
 );
 router.delete(
   '/:id',

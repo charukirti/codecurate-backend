@@ -1,4 +1,4 @@
-import { and, count, desc, eq, like, or } from 'drizzle-orm';
+import { and, count, desc, eq, like, ne, notInArray, or } from 'drizzle-orm';
 import { db } from '../../db';
 import { NewResource, Resource, resources } from '../../db/schema';
 import {
@@ -210,6 +210,88 @@ export const resourceService = {
     }
 
     return resource;
+  },
+
+  async getRelatedResources(id: string) {
+    const startTime = Date.now();
+    const [currentResource] = await db
+      .select({
+        id: resources.id,
+        topic: resources.topic,
+        codeLang: resources.codeLang,
+      })
+      .from(resources)
+      .where(eq(resources.id, id));
+
+    if (!currentResource) {
+      throw new NotFoundError('Resource does not exist.');
+    }
+
+    // phase 1: strict check: all conditions must match
+
+    const conditions = [
+      eq(resources.topic, currentResource.topic),
+      ne(resources.id, currentResource.id),
+    ];
+
+    if (currentResource.codeLang) {
+      conditions.push(eq(resources.codeLang, currentResource.codeLang));
+    }
+
+    let relatedResources = await db.query.resources.findMany({
+      where: and(...conditions),
+      limit: 4,
+      orderBy: desc(resources.avgRating),
+    });
+
+    // phase 2 : fetch by only topic if codeLang not matches
+
+    if (relatedResources.length < 4) {
+      // get existing ids
+
+      const existingIds = relatedResources.map((resource) => resource.id);
+
+      // find resources by same topic but should not conflict with existing elements in relatedResources
+
+      const tierTwoConditions = [
+        eq(resources.topic, currentResource.topic),
+        ne(resources.id, currentResource.id),
+        notInArray(resources.id, existingIds),
+      ];
+
+      const additionalResources = await db.query.resources.findMany({
+        where: and(...tierTwoConditions),
+        limit: 4 - relatedResources.length,
+        orderBy: desc(resources.avgRating),
+      });
+
+      // merge with previously found array
+
+      relatedResources = [...relatedResources, ...additionalResources];
+    }
+
+    // phase 3: fetch any resource with any topic
+
+    if (relatedResources.length < 4) {
+      const existingIds = relatedResources.map((resource) => resource.id);
+
+      const anyTopRatedResources = await db.query.resources.findMany({
+        where: and(
+          ne(resources.id, currentResource.id),
+          notInArray(resources.id, existingIds)
+        ),
+
+        limit: 4 - relatedResources.length,
+        orderBy: desc(resources.avgRating),
+      });
+
+      relatedResources = [...relatedResources, ...anyTopRatedResources];
+    }
+
+    const duration = Date.now() - startTime;
+    console.log(`getRelatedResources took ${duration}ms for resource ${id}`);
+
+    return relatedResources;
   },
 
   /**

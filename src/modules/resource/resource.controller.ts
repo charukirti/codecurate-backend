@@ -1,5 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import { createResourceInput, getResourcesQuery } from './resource.schema';
+import {
+  createResourceInput,
+  getResourceByIdParam,
+  getResourcesQuery,
+} from './resource.schema';
 import { extractVideoUrl } from '../../utils/extractVideoUrl';
 import { youtubeApiService } from './youtubeapi.service';
 import { resourceService } from './resource.service';
@@ -119,6 +123,25 @@ export async function getResource(
     res.status(200).json({
       message: 'Fetched resource successfully',
       data: resource,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getRelatedResources(
+  req: Request<getResourceByIdParam>,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { id } = req.params;
+
+    const relatedResources = await resourceService.getRelatedResources(id);
+
+    res.status(200).json({
+      message: 'Fetched related resources successfully',
+      data: relatedResources,
     });
   } catch (error) {
     next(error);

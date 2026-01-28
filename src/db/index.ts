@@ -4,4 +4,7 @@ import * as schema from './schema/index';
 import appConfig from '../config/app.config';
 
 const pool = new Pool({ connectionString: appConfig.db_url });
-export const db = drizzle(pool, { schema });
+export const db = drizzle(pool, {
+  schema,
+  logger: appConfig.node_env === 'development' ? true : false,
+});

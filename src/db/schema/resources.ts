@@ -53,6 +53,14 @@ export const resources = pgTable(
     index('idx_resources_code_lang').on(table.codeLang),
     index('idx_resources_videoLang').on(table.videoLang),
     index('idx_resources_channelName').on(table.channelName),
+
+    index('idx_resources_topic_codelang_rating').on(
+      table.topic,
+      table.codeLang,
+      table.avgRating.desc()
+    ),
+    index('idx_resources_topic').on(table.topic, table.avgRating.desc()),
+    index('idx_resources_rating').on(table.avgRating.desc()),
   ]
 );
 
