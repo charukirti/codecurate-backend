@@ -1,8 +1,9 @@
-import { eq } from 'drizzle-orm';
+import { asc, count, desc, eq } from 'drizzle-orm';
 import { db } from '../../db';
-import { User, users } from '../../db/schema';
+import { reviews, User, users } from '../../db/schema';
 import { ConflictError, NotFoundError } from '../../shared/errors';
 import { UpdateUserInput } from './users.schema';
+import { SortType } from '../../shared/schema';
 
 export const userService = {
   /**
@@ -74,5 +75,74 @@ export const userService = {
     } = updatedUser;
 
     return userData;
+  },
+
+  async getUserReviews(params: {
+    username: string;
+    page: number;
+    limit: number;
+    sort: SortType;
+  }) {
+    const { username, page, limit, sort } = params;
+
+    const offset = (page - 1) * limit;
+
+    const sortMapping = {
+      newest: desc(reviews.createdAt),
+      oldest: asc(reviews.createdAt),
+      highest: desc(reviews.rating),
+      lowest: asc(reviews.rating),
+    };
+
+    const [existingUser] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.username, username));
+
+    if (!existingUser) {
+      throw new NotFoundError('User does not exist.');
+    }
+
+    const userReviews = await db.query.reviews.findMany({
+      where: eq(reviews.userId, existingUser.id),
+      limit: limit,
+      offset: offset,
+      orderBy: sortMapping[sort],
+      with: {
+        resource: {
+          columns: {
+            id: true,
+            title: true,
+            thumbnails: true,
+            avgRating: true,
+            type: true,
+          },
+        },
+
+        reviewTags: {
+          with: {
+            tag: true,
+          },
+        },
+      },
+    });
+
+    const [reviewCount] = await db
+      .select({ count: count() })
+      .from(reviews)
+      .where(eq(reviews.userId, existingUser.id));
+
+    const totalItems = Number(reviewCount?.count || 0);
+    const totalPages = Math.ceil(totalItems / limit);
+
+    return {
+      reviews: userReviews,
+      pagination: {
+        page,
+        limit,
+        totalItems,
+        totalPages,
+      },
+    };
   },
 };

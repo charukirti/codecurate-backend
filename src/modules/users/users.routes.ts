@@ -1,12 +1,19 @@
 import { Router } from 'express';
 import { verifyToken } from '../auth/auth.middleware';
-import { getProfile, updateProfile } from './users.controller';
+import { getProfile, getUserReviews, updateProfile } from './users.controller';
 import { validate } from '../../middlewares/validate';
-import { updateUser } from './users.schema';
+import { updateUser, usersReviewsParamSchema } from './users.schema';
 
 const router = Router();
 
 router.get('/me', verifyToken, getProfile);
-router.patch('/me', verifyToken, validate(updateUser), updateProfile);
+router.patch('/me', verifyToken, validate({ body: updateUser }), updateProfile);
+router.get(
+  '/:username/reviews',
+  validate({
+    params: usersReviewsParamSchema,
+  }),
+  getUserReviews
+);
 
 export default router;

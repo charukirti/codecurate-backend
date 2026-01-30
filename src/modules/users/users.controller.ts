@@ -1,6 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { userService } from './users.service';
-import { UpdateUserInput } from './users.schema';
+import {
+  getUserReviewsQuerySchema,
+  UpdateUserInput,
+  UsersReviewsParam,
+} from './users.schema';
 import { UnauthorizedError } from '../../shared/errors';
 
 export async function getProfile(
@@ -45,6 +49,34 @@ export async function updateProfile(
     res.status(200).json({
       message: 'User updated successfully',
       data: user,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getUserReviews(
+  req: Request<UsersReviewsParam, {}, {}>,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { username } = req.params;
+    const { page, limit, sort } = getUserReviewsQuerySchema.parse(req.query);
+
+    const { reviews, pagination } = await userService.getUserReviews({
+      username,
+      page,
+      limit,
+      sort,
+    });
+
+    res.status(200).json({
+      message: 'User reviews retrieved successfully',
+      data: {
+        reviews,
+        pagination,
+      },
     });
   } catch (error) {
     next(error);
