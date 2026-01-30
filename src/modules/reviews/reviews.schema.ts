@@ -1,4 +1,5 @@
 import z from 'zod';
+import { sort } from '../../shared/schema';
 
 export const createReviewSchema = z.object({
   reviewText: z
@@ -33,8 +34,6 @@ export const createReviewSchema = z.object({
 export const resourceIdSchema = z.object({
   resourceId: z.uuid({ error: 'Not a valid resourceId' }),
 });
-
-export const sort = z.enum(['newest', 'oldest', 'highest', 'lowest']);
 
 export const getReviewsQuerySchema = z.object({
   page: z.coerce.number().int().optional().default(1),
@@ -80,6 +79,6 @@ export const updateReviewSchema = z.object({
 export type CreateReviewInput = z.infer<typeof createReviewSchema>;
 export type ResourceId = z.infer<typeof resourceIdSchema>;
 export type ReviewsQueryInput = z.infer<typeof getReviewsQuerySchema>;
-export type SortType = z.infer<typeof sort>;
+
 export type UpdateReviewInput = z.infer<typeof updateReviewSchema>;
 export type ReviewIdParams = z.infer<typeof reviewIdParamSchema>;

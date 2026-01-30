@@ -6,7 +6,7 @@ import {
   reviewData,
   ReviewResponse,
 } from './reviews.types';
-import { SortType, UpdateReviewInput } from './reviews.schema';
+import { UpdateReviewInput } from './reviews.schema';
 
 import {
   ConflictError,
@@ -15,6 +15,7 @@ import {
   NotFoundError,
   ValidationError,
 } from '../../shared/errors';
+import { SortType } from '../../shared/schema';
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
