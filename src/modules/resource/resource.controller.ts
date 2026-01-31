@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import {
   createResourceInput,
   getResourceByIdParam,
-  getResourcesQuery,
+  getResourcesQuerySchema,
 } from './resource.schema';
 import { extractVideoUrl } from '../../utils/extractVideoUrl';
 import { youtubeApiService } from './youtubeapi.service';
@@ -85,7 +85,7 @@ export async function getAllResources(
       type,
       page = 1,
       limit = 10,
-    } = req.query as unknown as getResourcesQuery;
+    } = getResourcesQuerySchema.parse(req.query);
 
     const { data, pagination } = await resourceService.getResources({
       search,

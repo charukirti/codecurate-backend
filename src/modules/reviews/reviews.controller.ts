@@ -2,9 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import { reviewService } from './reviews.service';
 import {
   CreateReviewInput,
+  getReviewsQuerySchema,
   ResourceId,
   ReviewIdParams,
-  ReviewsQueryInput,
   UpdateReviewInput,
 } from './reviews.schema';
 import { UnauthorizedError } from '../../shared/errors';
@@ -69,7 +69,7 @@ export async function getAllReviews(
   try {
     const { resourceId } = req.params;
 
-    const { page, limit, sort } = req.query as unknown as ReviewsQueryInput;
+    const { page, limit, sort } = getReviewsQuerySchema.parse(req.query);
 
     const { reviews, pagination } = await reviewService.getAllReviews({
       resourceId,

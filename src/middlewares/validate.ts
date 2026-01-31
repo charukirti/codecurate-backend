@@ -4,7 +4,7 @@ import { ValidationError } from '../shared/errors';
 
 /**
  * Middleware to validate request with zod scheams
- * * It validates `req.body`, `req.query`, `req.params` simultaneously
+ * * It validates `req.body`, `req.params` simultaneously
  * @throws {ValidationError} - if validation fails
  * @param validators - Object containing optional zod schemas for body, query and params
  * @returns Express middleware function
@@ -12,7 +12,6 @@ import { ValidationError } from '../shared/errors';
 
 interface RequestValidators {
   body?: z.ZodType;
-  query?: z.ZodType;
   params?: z.ZodType;
 }
 
@@ -21,10 +20,6 @@ export const validate = (validators: RequestValidators) => {
     try {
       if (validators.params) {
         validators.params.parse(req.params);
-      }
-
-      if (validators.query) {
-        validators.query.parse(req.query);
       }
 
       if (validators.body) {

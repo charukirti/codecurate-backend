@@ -5,7 +5,6 @@ import reviewRoutes from '../reviews/reviews.routes';
 import {
   createResourceSchema,
   getResourceParamSchema,
-  getResourcesQuerySchema,
 } from './resource.schema';
 import {
   createResource,
@@ -25,7 +24,7 @@ router.post(
   validate({ body: createResourceSchema }),
   createResource
 );
-router.get('/', validate({ query: getResourcesQuerySchema }), getAllResources);
+router.get('/', getAllResources);
 router.get('/:id', validate({ params: getResourceParamSchema }), getResource);
 router.get(
   '/:id/related',

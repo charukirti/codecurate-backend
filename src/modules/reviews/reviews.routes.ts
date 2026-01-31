@@ -9,7 +9,6 @@ import {
 import { validate } from '../../middlewares/validate';
 import {
   createReviewSchema,
-  getReviewsQuerySchema,
   resourceIdSchema,
   reviewIdParamSchema,
   updateReviewSchema,
@@ -29,12 +28,7 @@ router.post(
   createReview
 );
 
-router.get(
-  '/',
-  validate({ query: getReviewsQuerySchema }),
-  validate({ params: resourceIdSchema }),
-  getAllReviews
-);
+router.get('/', validate({ params: resourceIdSchema }), getAllReviews);
 
 router.patch(
   '/:reviewId',
