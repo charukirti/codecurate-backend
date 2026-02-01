@@ -7,11 +7,9 @@ import appConfig from '../../config/app.config';
 import { NotFoundError } from '../../shared/errors';
 import { parseISOtoSeconds } from '../../utils/parseToSeconds';
 
-const YOUTUBE_API_URL = 'https://www.googleapis.com/youtube/v3';
-
 export const youtubeApiService = {
   async getVideoDetails(videoId: string): Promise<VideoAPIResponse> {
-    const response = await axios.get(`${YOUTUBE_API_URL}/videos`, {
+    const response = await axios.get(`${appConfig.yt_api_url}/videos`, {
       params: {
         id: videoId,
         part: 'snippet,contentDetails,statistics',
@@ -27,7 +25,6 @@ export const youtubeApiService = {
 
     const video = items[0];
     const snippet = video.snippet;
-    const stats = video.statistics;
     const content = video.contentDetails;
 
     const duration = parseISOtoSeconds(content.duration);
@@ -41,13 +38,11 @@ export const youtubeApiService = {
       thumbnails: snippet.thumbnails,
       defaultAudioLanguage: snippet.defaultAudioLanguage,
       durationSeconds: duration || 0,
-      viewCount: parseInt(stats.viewCount),
-      likeCount: parseInt(stats.likeCount),
     };
   },
 
   async getPlaylistDetails(playlistId: string): Promise<PlaylistAPIResponse> {
-    const response = await axios.get(`${YOUTUBE_API_URL}/playlists`, {
+    const response = await axios.get(`${appConfig.yt_api_url}/playlists`, {
       params: {
         id: playlistId,
         part: 'snippet,contentDetails',

@@ -24,8 +24,6 @@ export type VideoAPIResponse = {
   };
   defaultAudioLanguage: string;
   durationSeconds: number;
-  viewCount: number;
-  likeCount: number;
 };
 
 export type PlaylistAPIResponse = {
