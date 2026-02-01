@@ -10,6 +10,8 @@ import {
   PlaylistAPIResponse,
   VideoAPIResponse,
 } from '../../types/youtube-api-response';
+import { CachedStats, ResourceWithStats } from './resource.types';
+import { fetchYouTubeStats } from '../../utils/fetchYouTubeStats';
 
 export const resourceService = {
   /**
@@ -197,7 +199,9 @@ export const resourceService = {
    * @returns : if resource exist returns data array
    */
 
-  async getResourceById(id: string): Promise<Resource> {
+  async getResourceById(id: string): Promise<ResourceWithStats> {
+    const cache = new Map<string, CachedStats>();
+
     const [resource] = await db
       .select()
       .from(resources)
@@ -207,11 +211,26 @@ export const resourceService = {
       throw new NotFoundError('Resource not found');
     }
 
-    return resource;
+    const cacheKey = `youtube-id-${resource.videoId}`;
+
+    let stats = cache.get(cacheKey);
+
+    if (!stats || Date.now() - stats.timestamp > 24 * 60 * 60 * 1000) {
+      stats = {
+        data: await fetchYouTubeStats(resource.videoId),
+        timestamp: Date.now(),
+      };
+      cache.set(cacheKey, stats);
+    }
+
+    return {
+      ...resource,
+      viewCount: stats.data.viewCount,
+      likeCount: stats.data.likeCount,
+    };
   },
 
   async getRelatedResources(id: string) {
-    const startTime = Date.now();
     const [currentResource] = await db
       .select({
         id: resources.id,
@@ -285,9 +304,6 @@ export const resourceService = {
 
       relatedResources = [...relatedResources, ...anyTopRatedResources];
     }
-
-    const duration = Date.now() - startTime;
-    console.log(`getRelatedResources took ${duration}ms for resource ${id}`);
 
     return relatedResources;
   },
