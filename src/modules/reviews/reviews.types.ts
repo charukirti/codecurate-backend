@@ -16,8 +16,7 @@ export type ReviewResponse = Reviews & {
 export type PaginatedReviewsResponse = {
   reviews: ReviewResponse[];
   pagination: {
-    page: number;
-    limit: number;
+    currentPage: number;
     totalItems: number;
     totalPages: number;
   };

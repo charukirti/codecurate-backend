@@ -215,8 +215,7 @@ export const reviewService = {
     return {
       reviews: reviewsWithTags,
       pagination: {
-        page,
-        limit,
+        currentPage: page,
         totalItems,
         totalPages,
       },

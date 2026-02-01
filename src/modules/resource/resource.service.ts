@@ -186,8 +186,6 @@ export const resourceService = {
         currentPage: page,
         totalPages,
         totalItems,
-        hasNextPage: page < totalPages,
-        hasPrevPage: page > 1,
       },
     };
   },
