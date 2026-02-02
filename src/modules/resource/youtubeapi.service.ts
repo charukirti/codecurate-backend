@@ -6,6 +6,7 @@ import {
 import appConfig from '../../config/app.config';
 import { NotFoundError } from '../../shared/errors';
 import { parseISOtoSeconds } from '../../utils/parseToSeconds';
+import { StatsData } from './resource.types';
 
 export const youtubeApiService = {
   async getVideoDetails(videoId: string): Promise<VideoAPIResponse> {
@@ -69,6 +70,30 @@ export const youtubeApiService = {
       thumbnails: snippet.thumbnails,
       itemCount: content.itemCount,
       publishedAt: new Date(snippet.publishedAt),
+    };
+  },
+
+  async getYouTubeStats(videoId: string | null): Promise<StatsData> {
+    const response = await axios.get(`${appConfig.yt_api_url}/videos`, {
+      params: {
+        id: videoId,
+        part: 'statistics',
+        key: appConfig.yt_api_key,
+      },
+    });
+
+    const items = response.data.items;
+
+    if (!items || items.length === 0) {
+      throw new NotFoundError('Video not found');
+    }
+
+    const video = items[0];
+    const stats = video.statistics;
+
+    return {
+      viewCount: parseInt(stats.viewCount),
+      likeCount: parseInt(stats.likeCount),
     };
   },
 };
