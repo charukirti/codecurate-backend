@@ -10,8 +10,9 @@ import {
   PlaylistAPIResponse,
   VideoAPIResponse,
 } from '../../types/youtube-api-response';
-import { CachedStats, ResourceWithStats } from './resource.types';
-import { fetchYouTubeStats } from '../../utils/fetchYouTubeStats';
+import { ResourceWithStats, StatsData } from './resource.types';
+import { statsCache } from './resource.utils';
+import { youtubeApiService } from './youtubeapi.service';
 
 export const resourceService = {
   /**
@@ -193,15 +194,13 @@ export const resourceService = {
   },
 
   /**
-   * Retrieves single resource from database
+   * Retrieves single resource from database with viewCount and likeCount
    * @param id : parameter to for getting resource
    * @throws {NotFoundError} : if resource does not exist throws not found error
-   * @returns : if resource exist returns data array
+   * @returns {ResourceWithStats}: returns resource data with viewCount and likeCount
    */
 
   async getResourceById(id: string): Promise<ResourceWithStats> {
-    const cache = new Map<string, CachedStats>();
-
     const [resource] = await db
       .select()
       .from(resources)
@@ -211,26 +210,38 @@ export const resourceService = {
       throw new NotFoundError('Resource not found');
     }
 
-    const cacheKey = `youtube-id-${resource.videoId}`;
+    let dynamicStas: StatsData = { viewCount: 0, likeCount: 0 };
 
-    let stats = cache.get(cacheKey);
+    if (resource.type === 'video' && resource.videoId) {
+      const { videoId } = resource;
 
-    if (!stats || Date.now() - stats.timestamp > 24 * 60 * 60 * 1000) {
-      stats = {
-        data: await fetchYouTubeStats(resource.videoId),
-        timestamp: Date.now(),
-      };
-      cache.set(cacheKey, stats);
+      const cached = statsCache.get(videoId);
+
+      if (cached) {
+        dynamicStas = cached;
+      } else {
+        const freshStats = await youtubeApiService.getYouTubeStats(videoId);
+
+        statsCache.set(videoId, freshStats);
+
+        dynamicStas = freshStats;
+      }
     }
 
     return {
       ...resource,
-      viewCount: stats.data.viewCount,
-      likeCount: stats.data.likeCount,
+      ...dynamicStas,
     };
   },
 
-  async getRelatedResources(id: string) {
+  /**
+   * retrieves at least 4 related resource based on the current resource's topic, codeLang.
+   * uses three tier system to gather related resource
+   * @param id : an id of the current resource (video/playlist)
+   * @returns {Resource[]} : array of related resources(video/playlist)
+   */
+
+  async getRelatedResources(id: string): Promise<Resource[]> {
     const [currentResource] = await db
       .select({
         id: resources.id,
@@ -243,8 +254,6 @@ export const resourceService = {
     if (!currentResource) {
       throw new NotFoundError('Resource does not exist.');
     }
-
-    // phase 1: strict check: all conditions must match
 
     const conditions = [
       eq(resources.topic, currentResource.topic),
@@ -261,14 +270,8 @@ export const resourceService = {
       orderBy: desc(resources.avgRating),
     });
 
-    // phase 2 : fetch by only topic if codeLang not matches
-
     if (relatedResources.length < 4) {
-      // get existing ids
-
       const existingIds = relatedResources.map((resource) => resource.id);
-
-      // find resources by same topic but should not conflict with existing elements in relatedResources
 
       const tierTwoConditions = [
         eq(resources.topic, currentResource.topic),
