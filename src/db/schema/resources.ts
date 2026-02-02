@@ -7,7 +7,6 @@ import {
   timestamp,
   uuid,
   varchar,
-  bigint,
   decimal,
   index,
 } from 'drizzle-orm/pg-core';
@@ -34,8 +33,6 @@ export const resources = pgTable(
     instructorName: varchar('instructor_name', { length: 255 }).notNull(),
 
     durationSeconds: integer('duration_seconds'),
-    viewCount: bigint('view_count', { mode: 'number' }),
-    likeCount: bigint('like_count', { mode: 'number' }),
 
     videoLang: varchar('video_lang', { length: 50 }).notNull(),
     codeLang: varchar('code_lang', { length: 50 }),
@@ -59,7 +56,7 @@ export const resources = pgTable(
       table.codeLang,
       table.avgRating.desc()
     ),
-    index('idx_resources_topic').on(table.topic, table.avgRating.desc()),
+    index('idx_resources_topic_tier').on(table.topic, table.avgRating.desc()),
     index('idx_resources_rating').on(table.avgRating.desc()),
   ]
 );
