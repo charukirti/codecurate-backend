@@ -64,6 +64,20 @@
       "when": 1770015552020,
       "tag": "0008_lucky_king_bedlam",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1770054210877,
+      "tag": "0009_broken_wither",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1770207706342,
+      "tag": "0010_superb_songbird",
+      "breakpoints": true
     }
   ]
 }

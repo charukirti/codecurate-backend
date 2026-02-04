@@ -26,6 +26,7 @@ export const reviews = pgTable(
     rating: integer('rating').notNull(),
     reviewText: text('review_text'),
 
+    reviewLikeCount: integer('review_like_count').default(0),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
   },
@@ -33,6 +34,7 @@ export const reviews = pgTable(
     uniqueIndex('unique_user_resource').on(table.userId, table.resourceId),
     index('idx_reviews_resource_id').on(table.resourceId),
     index('idx_reviews_user_id').on(table.userId),
+    index('idx_review_like_count').on(table.reviewLikeCount),
     check('rating_range', sql`rating >= 1 AND rating <= 10`),
   ]
 );
