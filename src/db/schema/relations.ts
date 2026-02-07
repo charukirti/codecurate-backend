@@ -1,9 +1,10 @@
-import { relations } from "drizzle-orm";
-import { resources } from "./resources";
-import { reviews } from "./review";
-import { users } from "./users";
-import { tags } from "./tags";
-import { reviewTags } from "./reviewTags";
+import { relations } from 'drizzle-orm';
+import { resources } from './resources';
+import { reviews } from './review';
+import { users } from './users';
+import { tags } from './tags';
+import { reviewTags } from './reviewTags';
+import { reviewLikes } from './reviewLikes';
 
 export const resourcesRelations = relations(resources, ({ many }) => ({
   reviews: many(reviews), // one resource can have multiple reviews
@@ -11,6 +12,7 @@ export const resourcesRelations = relations(resources, ({ many }) => ({
 
 export const userRelations = relations(users, ({ many }) => ({
   reviews: many(reviews), // one user can have many reviews
+  reviewLikes: many(reviewLikes),
 }));
 
 export const reviewsRelations = relations(reviews, ({ one, many }) => ({
@@ -23,6 +25,7 @@ export const reviewsRelations = relations(reviews, ({ one, many }) => ({
     references: [users.id], // review belongs to one user (i.e who wrote it)
   }),
   reviewTags: many(reviewTags),
+  reviewLikes: many(reviewLikes),
 }));
 
 export const tagsRelations = relations(tags, ({ many }) => ({
@@ -37,5 +40,17 @@ export const reviewTagsRelations = relations(reviewTags, ({ one }) => ({
   tag: one(tags, {
     fields: [reviewTags.tagId],
     references: [tags.id],
+  }),
+}));
+
+export const reviewLikesRelation = relations(reviewLikes, ({ one }) => ({
+  review: one(reviews, {
+    fields: [reviewLikes.reviewId],
+    references: [reviews.id],
+  }),
+
+  user: one(users, {
+    fields: [reviewLikes.userId],
+    references: [users.id],
   }),
 }));

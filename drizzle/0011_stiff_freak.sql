@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "unique_user_review_like" ON "reviewLikes" USING btree ("review_id","user_id");
