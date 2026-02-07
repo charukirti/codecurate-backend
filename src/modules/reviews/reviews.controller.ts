@@ -143,7 +143,30 @@ export async function likeReview(
     await reviewService.likeReview({ userId, reviewId });
 
     res.status(200).json({
-      message: 'Like has been added successfully',
+      message: 'Review liked successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function unlikeReview(
+  req: Request<ReviewLikeParam, {}, {}>,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const userId = req.userId;
+    if (!userId) {
+      throw new UnauthorizedError('User is not authenticated');
+    }
+
+    const { reviewId } = req.params;
+
+    await reviewService.unlikeReview({ reviewId, userId });
+
+    res.status(200).json({
+      message: 'Review unliked successfully',
     });
   } catch (error) {
     next(error);

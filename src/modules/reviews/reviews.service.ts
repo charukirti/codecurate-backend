@@ -373,6 +373,32 @@ export const reviewService = {
     });
   },
 
+  async unlikeReview(params: { reviewId: string; userId: string }) {
+    const { reviewId, userId } = params;
+    const existingLike = await db.query.reviewLikes.findFirst({
+      where: and(
+        eq(reviewLikes.reviewId, reviewId),
+        eq(reviewLikes.userId, userId)
+      ),
+      columns: { id: true },
+    });
+
+    if (!existingLike) {
+      return;
+    }
+
+    await db.transaction(async (tx) => {
+      await tx.delete(reviewLikes).where(eq(reviewLikes.id, existingLike.id));
+
+      await tx
+        .update(reviews)
+        .set({
+          reviewLikeCount: sql`GREATEST(${reviews.reviewLikeCount} - 1, 0)`,
+        })
+        .where(eq(reviews.id, reviewId));
+    });
+  },
+
   /**
    * Deletes a review for the user and recalculates average rating
    * @param params - object containing reviewId and userId
