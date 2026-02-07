@@ -76,9 +76,14 @@ export const updateReviewSchema = z.object({
     .optional(),
 });
 
+export const reviewLikeParamSchema = z.object({
+  reviewId: z.string({ error: 'This is not a valid review id' }),
+});
+
 export type CreateReviewInput = z.infer<typeof createReviewSchema>;
 export type ResourceId = z.infer<typeof resourceIdSchema>;
 export type ReviewsQueryInput = z.infer<typeof getReviewsQuerySchema>;
 
 export type UpdateReviewInput = z.infer<typeof updateReviewSchema>;
 export type ReviewIdParams = z.infer<typeof reviewIdParamSchema>;
+export type ReviewLikeParam = z.infer<typeof reviewLikeParamSchema>;

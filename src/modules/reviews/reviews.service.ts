@@ -1,6 +1,13 @@
 import { and, asc, count, desc, eq, inArray, sql } from 'drizzle-orm';
 import { db } from '../../db';
-import { resources, reviews, reviewTags, Tags, tags } from '../../db/schema';
+import {
+  resources,
+  reviewLikes,
+  reviews,
+  reviewTags,
+  Tags,
+  tags,
+} from '../../db/schema';
 import {
   PaginatedReviewsResponse,
   reviewData,
@@ -327,6 +334,43 @@ export const reviewService = {
     });
 
     return updatedReview;
+  },
+
+  async likeReview(params: { reviewId: string; userId: string }) {
+    const { userId, reviewId } = params;
+
+    const existingReview = await db.query.reviews.findFirst({
+      where: eq(reviews.id, reviewId),
+      columns: { id: true },
+    });
+
+    const existingLike = await db.query.reviewLikes.findFirst({
+      where: and(
+        eq(reviewLikes.userId, userId),
+        eq(reviewLikes.reviewId, reviewId)
+      ),
+      columns: { id: true },
+    });
+
+    if (!existingReview) {
+      throw new NotFoundError('Review does not exist');
+    }
+
+    if (existingLike) {
+      throw new ConflictError('You already liked review');
+    }
+
+    await db.transaction(async (tx) => {
+      await tx.insert(reviewLikes).values({
+        userId,
+        reviewId,
+      });
+
+      await tx
+        .update(reviews)
+        .set({ reviewLikeCount: sql`${reviews.reviewLikeCount} +1` })
+        .where(eq(reviews.id, reviewId));
+    });
   },
 
   /**

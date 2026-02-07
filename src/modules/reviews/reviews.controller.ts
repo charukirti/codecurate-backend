@@ -5,6 +5,7 @@ import {
   getReviewsQuerySchema,
   ResourceId,
   ReviewIdParams,
+  ReviewLikeParam,
   UpdateReviewInput,
 } from './reviews.schema';
 import { UnauthorizedError } from '../../shared/errors';
@@ -119,6 +120,30 @@ export async function updateReview(
     res.status(200).json({
       message: 'Review updated successfully',
       data: updatedReview,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function likeReview(
+  req: Request<ReviewLikeParam, {}, {}>,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const userId = req.userId;
+
+    if (!userId) {
+      throw new UnauthorizedError('User is not authenticated');
+    }
+
+    const { reviewId } = req.params;
+
+    await reviewService.likeReview({ userId, reviewId });
+
+    res.status(200).json({
+      message: 'Like has been added successfully',
     });
   } catch (error) {
     next(error);

@@ -4,6 +4,7 @@ import {
   deleteReview,
   getAllReviews,
   getAllTags,
+  likeReview,
   updateReview,
 } from './reviews.controller';
 import { validate } from '../../middlewares/validate';
@@ -11,6 +12,7 @@ import {
   createReviewSchema,
   resourceIdSchema,
   reviewIdParamSchema,
+  reviewLikeParamSchema,
   updateReviewSchema,
 } from './reviews.schema';
 import { verifyToken } from '../auth/auth.middleware';
@@ -43,6 +45,13 @@ router.delete(
   verifyToken,
   validate({ params: reviewIdParamSchema }),
   deleteReview
+);
+
+router.post(
+  '/:reviewId/like',
+  verifyToken,
+  validate({ params: reviewLikeParamSchema }),
+  likeReview
 );
 
 export { tagsRouter };
