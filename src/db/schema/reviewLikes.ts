@@ -19,5 +19,5 @@ export const reviewLikes = pgTable(
   ]
 );
 
-export type NewReviewLike = typeof reviewLikes.$inferSelect;
+export type NewReviewLike = typeof reviewLikes.$inferInsert;
 export type ReviewLike = typeof reviewLikes.$inferSelect;
