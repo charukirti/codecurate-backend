@@ -1,6 +1,8 @@
 import z from 'zod';
 import { sort } from '../../shared/schema';
 
+/* ---------- Schema for request body ------------ */
+
 export const createReviewSchema = z.object({
   reviewText: z
     .string()
@@ -27,23 +29,6 @@ export const createReviewSchema = z.object({
     })
     .min(2)
     .max(3),
-});
-
-/* Schema for param validation */
-
-export const resourceIdSchema = z.object({
-  resourceId: z.uuid({ error: 'Not a valid resourceId' }),
-});
-
-export const getReviewsQuerySchema = z.object({
-  page: z.coerce.number().int().min(1).optional().default(1),
-  limit: z.coerce.number().int().min(1).max(50).optional().default(10),
-  sort: sort.optional().default('newest'),
-});
-
-export const reviewIdParamSchema = z.object({
-  reviewId: z.uuid({ error: 'This is not a valid review id' }),
-  resourceId: z.uuid({ error: 'This is not a valid resource id' }),
 });
 
 export const updateReviewSchema = z.object({
@@ -76,14 +61,43 @@ export const updateReviewSchema = z.object({
     .optional(),
 });
 
-export const reviewLikeParamSchema = z.object({
+export const addReplySchema = z.object({
+  replyText: z
+    .string()
+    .min(10, { error: 'Review text must be at least 10 characters.' })
+    .max(500, { error: 'Review text must be at most 500 characters' })
+    .optional(),
+});
+
+/* ---------- Schema for request params ------------ */
+
+export const resourceIdSchema = z.object({
+  resourceId: z.uuid({ error: 'Not a valid resourceId' }),
+});
+
+export const reviewIdParamSchema = z.object({
+  reviewId: z.uuid({ error: 'This is not a valid review id' }),
+  resourceId: z.uuid({ error: 'This is not a valid resource id' }),
+});
+
+export const reviewParamSchema = z.object({
   reviewId: z.string({ error: 'This is not a valid review id' }),
 });
 
-export type CreateReviewInput = z.infer<typeof createReviewSchema>;
-export type ResourceId = z.infer<typeof resourceIdSchema>;
-export type ReviewsQueryInput = z.infer<typeof getReviewsQuerySchema>;
+/* ---------- Schema for request query ------------ */
 
+export const getReviewsQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).optional().default(1),
+  limit: z.coerce.number().int().min(1).max(50).optional().default(10),
+  sort: sort.optional().default('newest'),
+});
+
+export type CreateReviewInput = z.infer<typeof createReviewSchema>;
 export type UpdateReviewInput = z.infer<typeof updateReviewSchema>;
+export type AddReplyInput = z.infer<typeof addReplySchema>;
+
 export type ReviewIdParams = z.infer<typeof reviewIdParamSchema>;
-export type ReviewLikeParam = z.infer<typeof reviewLikeParamSchema>;
+export type ReviewIdParam = z.infer<typeof reviewParamSchema>;
+export type ResourceId = z.infer<typeof resourceIdSchema>;
+
+export type ReviewsQueryInput = z.infer<typeof getReviewsQuerySchema>;
