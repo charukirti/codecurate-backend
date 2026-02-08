@@ -5,6 +5,7 @@ import { users } from './users';
 import { tags } from './tags';
 import { reviewTags } from './reviewTags';
 import { reviewLikes } from './reviewLikes';
+import { reviewReply } from './reviewReply';
 
 export const resourcesRelations = relations(resources, ({ many }) => ({
   reviews: many(reviews), // one resource can have multiple reviews
@@ -13,6 +14,7 @@ export const resourcesRelations = relations(resources, ({ many }) => ({
 export const userRelations = relations(users, ({ many }) => ({
   reviews: many(reviews), // one user can have many reviews
   reviewLikes: many(reviewLikes),
+  reviewReply: many(reviewReply),
 }));
 
 export const reviewsRelations = relations(reviews, ({ one, many }) => ({
@@ -26,6 +28,7 @@ export const reviewsRelations = relations(reviews, ({ one, many }) => ({
   }),
   reviewTags: many(reviewTags),
   reviewLikes: many(reviewLikes),
+  reviewReply: many(reviewReply),
 }));
 
 export const tagsRelations = relations(tags, ({ many }) => ({
@@ -51,6 +54,18 @@ export const reviewLikesRelation = relations(reviewLikes, ({ one }) => ({
 
   user: one(users, {
     fields: [reviewLikes.userId],
+    references: [users.id],
+  }),
+}));
+
+export const reviewReplyRelation = relations(reviewReply, ({ one }) => ({
+  review: one(reviews, {
+    fields: [reviewReply.reviewId],
+    references: [reviews.id],
+  }),
+
+  user: one(users, {
+    fields: [reviewReply.userId],
     references: [users.id],
   }),
 }));
