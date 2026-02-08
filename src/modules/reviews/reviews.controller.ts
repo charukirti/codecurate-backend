@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { reviewService } from './reviews.service';
 import {
+  AddReplyInput,
   CreateReviewInput,
   getReviewsQuerySchema,
   ResourceId,
   ReviewIdParams,
-  ReviewLikeParam,
+  ReviewIdParam,
   UpdateReviewInput,
 } from './reviews.schema';
 import { UnauthorizedError } from '../../shared/errors';
@@ -127,7 +128,7 @@ export async function updateReview(
 }
 
 export async function likeReview(
-  req: Request<ReviewLikeParam, {}, {}>,
+  req: Request<ReviewIdParam, {}, {}>,
   res: Response,
   next: NextFunction
 ) {
@@ -151,7 +152,7 @@ export async function likeReview(
 }
 
 export async function unlikeReview(
-  req: Request<ReviewLikeParam, {}, {}>,
+  req: Request<ReviewIdParam, {}, {}>,
   res: Response,
   next: NextFunction
 ) {
@@ -194,6 +195,33 @@ export async function deleteReview(
 
     res.status(200).json({
       message: 'Review deleted successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function addReply(
+  req: Request<ReviewIdParams, {}, AddReplyInput>,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const userId = req.userId!;
+
+    const { reviewId } = req.params;
+
+    const { replyText } = req.body;
+
+    const reply = await reviewService.addReply({
+      reviewId,
+      userId,
+      replyText,
+    });
+
+    res.status(201).json({
+      message: 'Reply added successfully',
+      data: reply,
     });
   } catch (error) {
     next(error);

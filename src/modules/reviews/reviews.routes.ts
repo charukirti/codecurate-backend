@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import {
+  addReply,
   createReview,
   deleteReview,
   getAllReviews,
@@ -10,10 +11,11 @@ import {
 } from './reviews.controller';
 import { validate } from '../../middlewares/validate';
 import {
+  addReplySchema,
   createReviewSchema,
   resourceIdSchema,
   reviewIdParamSchema,
-  reviewLikeParamSchema,
+  reviewParamSchema,
   updateReviewSchema,
 } from './reviews.schema';
 import { verifyToken } from '../auth/auth.middleware';
@@ -51,15 +53,22 @@ router.delete(
 router.post(
   '/:reviewId/like',
   verifyToken,
-  validate({ params: reviewLikeParamSchema }),
+  validate({ params: reviewParamSchema }),
   likeReview
 );
 
 router.delete(
   '/:reviewId/like',
   verifyToken,
-  validate({ params: reviewLikeParamSchema }),
+  validate({ params: reviewParamSchema }),
   unlikeReview
+);
+
+router.post(
+  '/:reviewId/reply',
+  verifyToken,
+  validate({ params: reviewParamSchema, body: addReplySchema }),
+  addReply
 );
 
 export { tagsRouter };

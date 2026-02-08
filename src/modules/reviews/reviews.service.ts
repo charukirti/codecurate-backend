@@ -3,10 +3,12 @@ import { db } from '../../db';
 import {
   resources,
   reviewLikes,
+  reviewReply,
   reviews,
   reviewTags,
   Tags,
   tags,
+  users,
 } from '../../db/schema';
 import {
   PaginatedReviewsResponse,
@@ -375,6 +377,16 @@ export const reviewService = {
 
   async unlikeReview(params: { reviewId: string; userId: string }) {
     const { reviewId, userId } = params;
+
+    const existingReview = await db.query.reviews.findFirst({
+      where: eq(reviews.id, reviewId),
+      columns: { id: true },
+    });
+
+    if (!existingReview) {
+      throw new NotFoundError('Review does not exist');
+    }
+
     const existingLike = await db.query.reviewLikes.findFirst({
       where: and(
         eq(reviewLikes.reviewId, reviewId),
@@ -429,5 +441,44 @@ export const reviewService = {
       await tx.delete(reviews).where(eq(reviews.id, reviewId));
       await this._calculateAndUpdateRating(tx, existingReview.resourceId);
     });
+  },
+
+  /* reply to review */
+
+  async addReply(params: {
+    reviewId: string;
+    userId: string;
+    replyText?: string;
+  }) {
+    const { reviewId, replyText, userId } = params;
+
+    const existingReview = await db.query.reviews.findFirst({
+      where: eq(reviews.id, reviewId),
+      columns: { id: true },
+    });
+
+    if (!existingReview) {
+      throw new NotFoundError('Review does not exist');
+    }
+
+    const [reply] = await db
+      .insert(reviewReply)
+      .values({
+        userId: userId,
+        reviewId: existingReview.id,
+        replyText: replyText,
+      })
+      .returning();
+
+    const [user] = await db
+      .select({ username: users.username })
+      .from(users)
+      .where(eq(users.id, userId));
+
+    return {
+      username: user?.username,
+      replyText: reply?.replyText,
+      createdAt: reply?.createdAt,
+    };
   },
 };
