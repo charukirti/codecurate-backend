@@ -1,0 +1,1 @@
+ALTER TABLE "reviewReply" ALTER COLUMN "reply_text" SET NOT NULL;
