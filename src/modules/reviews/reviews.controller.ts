@@ -9,6 +9,7 @@ import {
   ReviewIdParam,
   UpdateReviewInput,
   ReplyIdParam,
+  getRepliesQuerySchema,
 } from './reviews.schema';
 import { UnauthorizedError } from '../../shared/errors';
 
@@ -208,7 +209,11 @@ export async function addReply(
   next: NextFunction
 ) {
   try {
-    const userId = req.userId!;
+    const userId = req.userId;
+
+    if (!userId) {
+      throw new UnauthorizedError('User not authenticated');
+    }
 
     const { reviewId } = req.params;
 
@@ -235,7 +240,12 @@ export async function updateReply(
   next: NextFunction
 ) {
   try {
-    const userId = req.userId!;
+    const userId = req.userId;
+
+    if (!userId) {
+      throw new UnauthorizedError('User not authenticated');
+    }
+
     const { reviewId, replyId } = req.params;
     const { replyText } = req.body;
 
@@ -249,6 +259,33 @@ export async function updateReply(
     res.status(200).json({
       message: 'Reply updated successfully',
       data: reply,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getAllReplies(
+  req: Request<ReviewIdParam, {}, {}>,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { reviewId } = req.params;
+    const { page, limit } = getRepliesQuerySchema.parse(req.query);
+
+    const { replies, pagination } = await reviewService.getAllReplies({
+      reviewId,
+      page,
+      limit,
+    });
+
+    res.status(200).json({
+      message: 'Fetched all replies successfully',
+      data: {
+        replies,
+        pagination,
+      },
     });
   } catch (error) {
     next(error);

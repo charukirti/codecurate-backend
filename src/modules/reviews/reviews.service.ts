@@ -12,6 +12,7 @@ import {
   users,
 } from '../../db/schema';
 import {
+  paginatedRepliesResponse,
   PaginatedReviewsResponse,
   replyResponse,
   reviewData,
@@ -538,5 +539,52 @@ export const reviewService = {
     }
 
     return updatedReply;
+  },
+
+  async getAllReplies(params: {
+    reviewId: string;
+    page: number;
+    limit: number;
+  }): Promise<paginatedRepliesResponse> {
+    const { reviewId, page, limit } = params;
+    const offset = (page - 1) * limit;
+
+    const replies = await db.query.reviewReply.findMany({
+      where: eq(reviewReply.reviewId, reviewId),
+      orderBy: desc(reviewReply.createdAt),
+      offset: offset,
+      limit: limit,
+      columns: {
+        id: true,
+        replyText: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      with: {
+        user: {
+          columns: {
+            username: true,
+          },
+        },
+      },
+    });
+
+    const [countResult] = await db
+      .select({ count: count() })
+      .from(reviewReply)
+      .where(eq(reviewReply.reviewId, reviewId));
+
+    const totalItems = Number(countResult?.count || 0);
+
+    const totalPages = Math.ceil(totalItems / limit);
+
+    return {
+      replies,
+      pagination: {
+        currentPage: page,
+        totalItems,
+        totalPages,
+      },
+    };
   },
 };

@@ -3,6 +3,7 @@ import {
   addReply,
   createReview,
   deleteReview,
+  getAllReplies,
   getAllReviews,
   getAllTags,
   likeReview,
@@ -67,17 +68,23 @@ router.delete(
 );
 
 router.post(
-  '/:reviewId/reply',
+  '/:reviewId/replies',
   verifyToken,
   validate({ params: reviewParamSchema, body: addReplySchema }),
   addReply
 );
 
 router.patch(
-  '/:reviewId/reply/:replyId',
+  '/:reviewId/replies/:replyId',
   verifyToken,
   validate({ params: replyParamSchema, body: addReplySchema }),
   updateReply
+);
+
+router.get(
+  '/:reviewId/replies',
+  validate({ params: reviewParamSchema }),
+  getAllReplies
 );
 
 export { tagsRouter };

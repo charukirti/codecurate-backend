@@ -30,3 +30,20 @@ export type replyResponse = {
   replyText: string;
   createdAt: Date | null;
 };
+
+/* ---- Return type for getAllReply ---- */
+
+export type paginatedRepliesResponse = {
+  replies: {
+    id: string;
+    replyText: string;
+    createdAt: Date | null;
+    updatedAt: Date | null;
+    user: { username: string };
+  }[];
+  pagination: {
+    currentPage: number;
+    totalItems: number;
+    totalPages: number;
+  };
+};

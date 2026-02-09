@@ -96,6 +96,11 @@ export const getReviewsQuerySchema = z.object({
   sort: sort.optional().default('newest'),
 });
 
+export const getRepliesQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).optional().default(1),
+  limit: z.coerce.number().int().min(1).max(50).optional().default(10),
+});
+
 export type CreateReviewInput = z.infer<typeof createReviewSchema>;
 export type UpdateReviewInput = z.infer<typeof updateReviewSchema>;
 export type AddReplyInput = z.infer<typeof addReplySchema>;
@@ -106,3 +111,4 @@ export type ReplyIdParam = z.infer<typeof replyParamSchema>;
 export type ResourceId = z.infer<typeof resourceIdSchema>;
 
 export type ReviewsQueryInput = z.infer<typeof getReviewsQuerySchema>;
+export type ReplyQueryInput = z.infer<typeof getRepliesQuerySchema>;
