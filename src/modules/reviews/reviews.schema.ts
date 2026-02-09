@@ -65,8 +65,7 @@ export const addReplySchema = z.object({
   replyText: z
     .string()
     .min(10, { error: 'Review text must be at least 10 characters.' })
-    .max(500, { error: 'Review text must be at most 500 characters' })
-    .optional(),
+    .max(500, { error: 'Review text must be at most 500 characters' }),
 });
 
 /* ---------- Schema for request params ------------ */
@@ -81,7 +80,12 @@ export const reviewIdParamSchema = z.object({
 });
 
 export const reviewParamSchema = z.object({
-  reviewId: z.string({ error: 'This is not a valid review id' }),
+  reviewId: z.uuid({ error: 'This is not a valid review id' }),
+});
+
+export const replyParamSchema = z.object({
+  reviewId: z.uuid({ error: 'This is not a valid review id' }),
+  replyId: z.uuid({ error: 'This is not a valid review id' }),
 });
 
 /* ---------- Schema for request query ------------ */
@@ -98,6 +102,7 @@ export type AddReplyInput = z.infer<typeof addReplySchema>;
 
 export type ReviewIdParams = z.infer<typeof reviewIdParamSchema>;
 export type ReviewIdParam = z.infer<typeof reviewParamSchema>;
+export type ReplyIdParam = z.infer<typeof replyParamSchema>;
 export type ResourceId = z.infer<typeof resourceIdSchema>;
 
 export type ReviewsQueryInput = z.infer<typeof getReviewsQuerySchema>;
