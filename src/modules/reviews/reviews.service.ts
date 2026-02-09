@@ -3,6 +3,7 @@ import { db } from '../../db';
 import {
   resources,
   reviewLikes,
+  ReviewRelply,
   reviewReply,
   reviews,
   reviewTags,
@@ -12,6 +13,7 @@ import {
 } from '../../db/schema';
 import {
   PaginatedReviewsResponse,
+  replyResponse,
   reviewData,
   ReviewResponse,
 } from './reviews.types';
@@ -83,7 +85,7 @@ export const reviewService = {
    * @throws {InternalError} if review creation fails
    */
 
-  async createReview(data: reviewData): Promise<ReviewResponse | undefined> {
+  async createReview(data: reviewData): Promise<ReviewResponse> {
     const { userId, resourceId, rating, reviewText, tagIds } = data;
 
     const [existingResource] = await db
@@ -246,7 +248,7 @@ export const reviewService = {
     userId: string;
     resourceId: string;
     data: UpdateReviewInput;
-  }): Promise<ReviewResponse | undefined> {
+  }): Promise<ReviewResponse> {
     const { userId, resourceId, reviewId, data } = params;
 
     const existingReview = await db.query.reviews.findFirst({
@@ -325,7 +327,7 @@ export const reviewService = {
       });
 
       if (!updatedReviewWithTags) {
-        throw new InternalError('Failed to fetch the created review');
+        throw new InternalError('Failed to fetch the updated review');
       }
 
       return {
@@ -448,8 +450,8 @@ export const reviewService = {
   async addReply(params: {
     reviewId: string;
     userId: string;
-    replyText?: string;
-  }) {
+    replyText: string;
+  }): Promise<replyResponse> {
     const { reviewId, replyText, userId } = params;
 
     const existingReview = await db.query.reviews.findFirst({
@@ -470,15 +472,71 @@ export const reviewService = {
       })
       .returning();
 
+    if (!reply) {
+      throw new InternalError('Unable to add reply');
+    }
+
     const [user] = await db
       .select({ username: users.username })
       .from(users)
       .where(eq(users.id, userId));
 
+    if (!user) {
+      throw new InternalError('Unable to fetch user');
+    }
+
     return {
-      username: user?.username,
-      replyText: reply?.replyText,
-      createdAt: reply?.createdAt,
+      id: reply.id,
+      username: user.username,
+      replyText: reply.replyText,
+      createdAt: reply.createdAt,
     };
+  },
+
+  async updateReply(params: {
+    reviewId: string;
+    userId: string;
+    replyId: string;
+    replyText: string;
+  }): Promise<ReviewRelply> {
+    const { reviewId, userId, replyText, replyId } = params;
+
+    const existingReview = await db.query.reviews.findFirst({
+      where: and(eq(reviews.id, reviewId)),
+      columns: { id: true },
+    });
+
+    if (!existingReview) {
+      throw new NotFoundError('Review does not exist');
+    }
+
+    const existingReply = await db.query.reviewReply.findFirst({
+      where: eq(reviewReply.id, replyId),
+      columns: { id: true, userId: true, reviewId: true },
+    });
+
+    if (!existingReply) {
+      throw new NotFoundError('Reply does not exist');
+    }
+
+    if (existingReply.userId !== userId) {
+      throw new ForbiddenError('Reply does not belong to this user');
+    }
+
+    if (existingReply.reviewId !== reviewId) {
+      throw new NotFoundError('Reply does not belong to this review');
+    }
+
+    const [updatedReply] = await db
+      .update(reviewReply)
+      .set({ replyText: replyText, updatedAt: new Date() })
+      .where(eq(reviewReply.id, replyId))
+      .returning();
+
+    if (!updatedReply) {
+      throw new InternalError('Failed to update the reply');
+    }
+
+    return updatedReply;
   },
 };

@@ -8,6 +8,7 @@ import {
   ReviewIdParams,
   ReviewIdParam,
   UpdateReviewInput,
+  ReplyIdParam,
 } from './reviews.schema';
 import { UnauthorizedError } from '../../shared/errors';
 
@@ -221,6 +222,32 @@ export async function addReply(
 
     res.status(201).json({
       message: 'Reply added successfully',
+      data: reply,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function updateReply(
+  req: Request<ReplyIdParam, {}, AddReplyInput>,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const userId = req.userId!;
+    const { reviewId, replyId } = req.params;
+    const { replyText } = req.body;
+
+    const reply = await reviewService.updateReply({
+      reviewId,
+      userId,
+      replyId,
+      replyText,
+    });
+
+    res.status(200).json({
+      message: 'Reply updated successfully',
       data: reply,
     });
   } catch (error) {

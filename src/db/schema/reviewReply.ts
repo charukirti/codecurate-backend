@@ -10,10 +10,10 @@ export const reviewReply = pgTable('reviewReply', {
   reviewId: uuid('review_id')
     .references(() => reviews.id, { onDelete: 'cascade' })
     .notNull(),
-  replyText: varchar('reply_text'),
+  replyText: varchar('reply_text').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-export const NewReviewReplyInput = typeof reviewReply.$inferInsert;
-export const ReviewRelply = typeof reviewReply.$inferSelect;
+export type NewReviewReplyInput = typeof reviewReply.$inferInsert;
+export type ReviewRelply = typeof reviewReply.$inferSelect;

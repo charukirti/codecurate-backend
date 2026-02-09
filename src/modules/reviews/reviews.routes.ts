@@ -7,12 +7,14 @@ import {
   getAllTags,
   likeReview,
   unlikeReview,
+  updateReply,
   updateReview,
 } from './reviews.controller';
 import { validate } from '../../middlewares/validate';
 import {
   addReplySchema,
   createReviewSchema,
+  replyParamSchema,
   resourceIdSchema,
   reviewIdParamSchema,
   reviewParamSchema,
@@ -69,6 +71,13 @@ router.post(
   verifyToken,
   validate({ params: reviewParamSchema, body: addReplySchema }),
   addReply
+);
+
+router.patch(
+  '/:reviewId/reply/:replyId',
+  verifyToken,
+  validate({ params: replyParamSchema, body: addReplySchema }),
+  updateReply
 );
 
 export { tagsRouter };

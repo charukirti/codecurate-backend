@@ -21,3 +21,12 @@ export type PaginatedReviewsResponse = {
     totalPages: number;
   };
 };
+
+/* ---- Return type for addReply ---- */
+
+export type replyResponse = {
+  id: string;
+  username: string;
+  replyText: string;
+  createdAt: Date | null;
+};
