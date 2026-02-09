@@ -291,3 +291,26 @@ export async function getAllReplies(
     next(error);
   }
 }
+
+export async function deleteReply(
+  req: Request<ReplyIdParam, {}, {}>,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const userId = req.userId;
+    const { replyId } = req.params;
+
+    if (!userId) {
+      throw new UnauthorizedError('User not authenticated');
+    }
+
+    await reviewService.deleteReply({ replyId, userId });
+
+    res.status(200).json({
+      message: 'Reply deleted successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+}

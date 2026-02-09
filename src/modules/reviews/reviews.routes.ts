@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   addReply,
   createReview,
+  deleteReply,
   deleteReview,
   getAllReplies,
   getAllReviews,
@@ -85,6 +86,13 @@ router.get(
   '/:reviewId/replies',
   validate({ params: reviewParamSchema }),
   getAllReplies
+);
+
+router.delete(
+  '/:reviewId/replies/:replyId',
+  verifyToken,
+  validate({ params: replyParamSchema }),
+  deleteReply
 );
 
 export { tagsRouter };

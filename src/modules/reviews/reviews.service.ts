@@ -503,7 +503,7 @@ export const reviewService = {
     const { reviewId, userId, replyText, replyId } = params;
 
     const existingReview = await db.query.reviews.findFirst({
-      where: and(eq(reviews.id, reviewId)),
+      where: eq(reviews.id, reviewId),
       columns: { id: true },
     });
 
@@ -586,5 +586,27 @@ export const reviewService = {
         totalPages,
       },
     };
+  },
+
+  async deleteReply(params: {
+    replyId: string;
+    userId: string;
+  }): Promise<void> {
+    const { userId, replyId } = params;
+
+    const reply = await db.query.reviewReply.findFirst({
+      where: eq(reviewReply.id, replyId),
+      columns: { id: true, userId: true },
+    });
+
+    if (!reply) {
+      throw new NotFoundError('Reply does not exist');
+    }
+
+    if (reply.userId !== userId) {
+      throw new ForbiddenError('Reply does not belong to this user');
+    }
+
+    await db.delete(reviewReply).where(eq(reviewReply.id, replyId));
   },
 };
