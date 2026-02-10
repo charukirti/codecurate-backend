@@ -16,10 +16,10 @@ import { validate } from '../../middlewares/validate';
 import {
   addReplySchema,
   createReviewSchema,
-  replyParamSchema,
-  resourceIdSchema,
+  reviewAndReplyIdParamSchema,
+  resourceIdParamSchema,
+  reviewAndResourceParamsSchema,
   reviewIdParamSchema,
-  reviewParamSchema,
   updateReviewSchema,
 } from './reviews.schema';
 import { verifyToken } from '../auth/auth.middleware';
@@ -33,16 +33,16 @@ router.post(
   '/',
   verifyToken,
   validate({ body: createReviewSchema }),
-  validate({ params: resourceIdSchema }),
+  validate({ params: resourceIdParamSchema }),
   createReview
 );
 
-router.get('/', validate({ params: resourceIdSchema }), getAllReviews);
+router.get('/', validate({ params: resourceIdParamSchema }), getAllReviews);
 
 router.patch(
   '/:reviewId',
   verifyToken,
-  validate({ params: reviewIdParamSchema }),
+  validate({ params: reviewAndResourceParamsSchema }),
   validate({ body: updateReviewSchema }),
   updateReview
 );
@@ -50,48 +50,48 @@ router.patch(
 router.delete(
   '/:reviewId',
   verifyToken,
-  validate({ params: reviewIdParamSchema }),
+  validate({ params: reviewAndResourceParamsSchema }),
   deleteReview
 );
 
 router.post(
   '/:reviewId/like',
   verifyToken,
-  validate({ params: reviewParamSchema }),
+  validate({ params: reviewIdParamSchema }),
   likeReview
 );
 
 router.delete(
   '/:reviewId/like',
   verifyToken,
-  validate({ params: reviewParamSchema }),
+  validate({ params: reviewIdParamSchema }),
   unlikeReview
 );
 
 router.post(
   '/:reviewId/replies',
   verifyToken,
-  validate({ params: reviewParamSchema, body: addReplySchema }),
+  validate({ params: reviewIdParamSchema, body: addReplySchema }),
   addReply
 );
 
 router.patch(
   '/:reviewId/replies/:replyId',
   verifyToken,
-  validate({ params: replyParamSchema, body: addReplySchema }),
+  validate({ params: reviewAndReplyIdParamSchema, body: addReplySchema }),
   updateReply
 );
 
 router.get(
   '/:reviewId/replies',
-  validate({ params: reviewParamSchema }),
+  validate({ params: reviewIdParamSchema }),
   getAllReplies
 );
 
 router.delete(
   '/:reviewId/replies/:replyId',
   verifyToken,
-  validate({ params: replyParamSchema }),
+  validate({ params: reviewAndReplyIdParamSchema }),
   deleteReply
 );
 

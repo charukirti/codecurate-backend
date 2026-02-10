@@ -70,22 +70,22 @@ export const addReplySchema = z.object({
 
 /* ---------- Schema for request params ------------ */
 
-export const resourceIdSchema = z.object({
+export const resourceIdParamSchema = z.object({
   resourceId: z.uuid({ error: 'Not a valid resourceId' }),
 });
 
-export const reviewIdParamSchema = z.object({
+export const reviewAndResourceParamsSchema = z.object({
   reviewId: z.uuid({ error: 'This is not a valid review id' }),
   resourceId: z.uuid({ error: 'This is not a valid resource id' }),
 });
 
-export const reviewParamSchema = z.object({
+export const reviewIdParamSchema = z.object({
   reviewId: z.uuid({ error: 'This is not a valid review id' }),
 });
 
-export const replyParamSchema = z.object({
+export const reviewAndReplyIdParamSchema = z.object({
   reviewId: z.uuid({ error: 'This is not a valid review id' }),
-  replyId: z.uuid({ error: 'This is not a valid review id' }),
+  replyId: z.uuid({ error: 'This is not a valid reply id' }),
 });
 
 /* ---------- Schema for request query ------------ */
@@ -105,10 +105,14 @@ export type CreateReviewInput = z.infer<typeof createReviewSchema>;
 export type UpdateReviewInput = z.infer<typeof updateReviewSchema>;
 export type AddReplyInput = z.infer<typeof addReplySchema>;
 
+export type ReviewAndResourceParams = z.infer<
+  typeof reviewAndResourceParamsSchema
+>;
 export type ReviewIdParams = z.infer<typeof reviewIdParamSchema>;
-export type ReviewIdParam = z.infer<typeof reviewParamSchema>;
-export type ReplyIdParam = z.infer<typeof replyParamSchema>;
-export type ResourceId = z.infer<typeof resourceIdSchema>;
+export type ReviewAndReplyIdParams = z.infer<
+  typeof reviewAndReplyIdParamSchema
+>;
+export type ResourceIdParams = z.infer<typeof resourceIdParamSchema>;
 
 export type ReviewsQueryInput = z.infer<typeof getReviewsQuerySchema>;
 export type ReplyQueryInput = z.infer<typeof getRepliesQuerySchema>;

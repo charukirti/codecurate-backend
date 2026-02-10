@@ -4,11 +4,11 @@ import {
   AddReplyInput,
   CreateReviewInput,
   getReviewsQuerySchema,
-  ResourceId,
+  ResourceIdParams,
+  ReviewAndResourceParams,
   ReviewIdParams,
-  ReviewIdParam,
   UpdateReviewInput,
-  ReplyIdParam,
+  ReviewAndReplyIdParams,
   getRepliesQuerySchema,
 } from './reviews.schema';
 import { UnauthorizedError } from '../../shared/errors';
@@ -30,7 +30,7 @@ export async function getAllTags(
 }
 
 export async function createReview(
-  req: Request<ResourceId, {}, CreateReviewInput>,
+  req: Request<ResourceIdParams, {}, CreateReviewInput>,
   res: Response,
   next: NextFunction
 ) {
@@ -66,7 +66,7 @@ export async function createReview(
 }
 
 export async function getAllReviews(
-  req: Request<ResourceId, {}, {}>,
+  req: Request<ResourceIdParams, {}, {}>,
   res: Response,
   next: NextFunction
 ) {
@@ -95,7 +95,7 @@ export async function getAllReviews(
 }
 
 export async function updateReview(
-  req: Request<ReviewIdParams, {}, UpdateReviewInput>,
+  req: Request<ReviewAndResourceParams, {}, UpdateReviewInput>,
   res: Response,
   next: NextFunction
 ) {
@@ -130,7 +130,7 @@ export async function updateReview(
 }
 
 export async function likeReview(
-  req: Request<ReviewIdParam, {}, {}>,
+  req: Request<ReviewIdParams, {}, {}>,
   res: Response,
   next: NextFunction
 ) {
@@ -154,7 +154,7 @@ export async function likeReview(
 }
 
 export async function unlikeReview(
-  req: Request<ReviewIdParam, {}, {}>,
+  req: Request<ReviewIdParams, {}, {}>,
   res: Response,
   next: NextFunction
 ) {
@@ -177,7 +177,7 @@ export async function unlikeReview(
 }
 
 export async function deleteReview(
-  req: Request<ReviewIdParams, {}, {}>,
+  req: Request<ReviewAndResourceParams, {}, {}>,
   res: Response,
   next: NextFunction
 ) {
@@ -204,7 +204,7 @@ export async function deleteReview(
 }
 
 export async function addReply(
-  req: Request<ReviewIdParams, {}, AddReplyInput>,
+  req: Request<ReviewAndResourceParams, {}, AddReplyInput>,
   res: Response,
   next: NextFunction
 ) {
@@ -235,7 +235,7 @@ export async function addReply(
 }
 
 export async function updateReply(
-  req: Request<ReplyIdParam, {}, AddReplyInput>,
+  req: Request<ReviewAndReplyIdParams, {}, AddReplyInput>,
   res: Response,
   next: NextFunction
 ) {
@@ -266,7 +266,7 @@ export async function updateReply(
 }
 
 export async function getAllReplies(
-  req: Request<ReviewIdParam, {}, {}>,
+  req: Request<ReviewIdParams, {}, {}>,
   res: Response,
   next: NextFunction
 ) {
@@ -293,7 +293,7 @@ export async function getAllReplies(
 }
 
 export async function deleteReply(
-  req: Request<ReplyIdParam, {}, {}>,
+  req: Request<ReviewAndReplyIdParams, {}, {}>,
   res: Response,
   next: NextFunction
 ) {
