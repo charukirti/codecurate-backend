@@ -1,18 +1,21 @@
 import { Router } from 'express';
 import {
-  addReply,
   createReview,
-  deleteReply,
   deleteReview,
-  getAllReplies,
   getAllReviews,
   getAllTags,
-  likeReview,
-  unlikeReview,
-  updateReply,
   updateReview,
-} from './reviews.controller';
+} from './controllers/reviews.controller';
+import { likeReview, unlikeReview } from './controllers/like.controller';
+import {
+  addReply,
+  deleteReply,
+  getAllReplies,
+  updateReply,
+} from './controllers/reply.controller';
+
 import { validate } from '../../middlewares/validate';
+
 import {
   addReplySchema,
   createReviewSchema,
@@ -22,6 +25,7 @@ import {
   reviewIdParamSchema,
   updateReviewSchema,
 } from './reviews.schema';
+
 import { verifyToken } from '../auth/auth.middleware';
 
 const router = Router({ mergeParams: true });
