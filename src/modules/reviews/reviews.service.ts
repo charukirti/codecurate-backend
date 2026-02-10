@@ -3,7 +3,7 @@ import { db } from '../../db';
 import {
   resources,
   reviewLikes,
-  ReviewRelply,
+  ReviewReply,
   reviewReply,
   reviews,
   reviewTags,
@@ -32,6 +32,10 @@ import { SortType } from '../../shared/schema';
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 export const reviewService = {
+  /* ============================================
+   *           HELPER METHODS
+   * ============================================ */
+
   /**
    * Calculates the average rating and updates the resource table column
    * @param tx - database transaction
@@ -75,6 +79,10 @@ export const reviewService = {
     }
     return allTags;
   },
+
+  /* ============================================
+   *           REVIEW OPERATIONS
+   * ============================================ */
 
   /**
    * Creates a new review with user selected tags for a resource
@@ -237,7 +245,7 @@ export const reviewService = {
   /**
    * Updates an existing review and recalculates average rating
    * @param params - object containing reviewId, userId, resourceId, and data to update
-   * @returns {Promise<ReviewWithTags | undefined>} updated review with tags
+   * @returns {Promise<ReviewWithTags>} updated review with tags
    * @throws {NotFoundError} if review does not exist
    * @throws {ForbiddenError} if review does not belong to current user
    * @throws {ValidationError} if tags are not valid
@@ -341,7 +349,54 @@ export const reviewService = {
     return updatedReview;
   },
 
-  async likeReview(params: { reviewId: string; userId: string }) {
+  /**
+   * Deletes a review for the user and recalculates average rating
+   * @param params - object containing reviewId and userId
+   * @returns {Promise<void>}
+   * @throws {NotFoundError} if review does not exist
+   * @throws {ForbiddenError} if review does not belong to current user
+   */
+
+  async deleteReview(params: {
+    reviewId: string;
+    userId: string;
+  }): Promise<void> {
+    const { reviewId, userId } = params;
+
+    const existingReview = await db.query.reviews.findFirst({
+      where: eq(reviews.id, reviewId),
+    });
+
+    if (!existingReview) {
+      throw new NotFoundError('Review does not exist!');
+    }
+
+    if (existingReview.userId !== userId) {
+      throw new ForbiddenError('Review does not belong to this user');
+    }
+
+    await db.transaction(async (tx) => {
+      await tx.delete(reviews).where(eq(reviews.id, reviewId));
+      await this._calculateAndUpdateRating(tx, existingReview.resourceId);
+    });
+  },
+
+  /* ============================================
+   *           REVIEW LIKE OPERATIONS
+   * ============================================ */
+
+  /**
+   * Adds a like to a review and increments the like count
+   * @param params - object containing reviewId and userId
+   * @returns {Promise<void>}
+   * @throws {NotFoundError} if review does not exist
+   * @throws {ConflictError} if user has already liked the review
+   */
+
+  async likeReview(params: {
+    reviewId: string;
+    userId: string;
+  }): Promise<void> {
     const { userId, reviewId } = params;
 
     const existingReview = await db.query.reviews.findFirst({
@@ -378,7 +433,17 @@ export const reviewService = {
     });
   },
 
-  async unlikeReview(params: { reviewId: string; userId: string }) {
+  /**
+   * Removes a like from a review and decrements the like count
+   * @param params - object containing reviewId and userId
+   * @returns {Promise<void>}
+   * @throws {NotFoundError} if review does not exist
+   */
+
+  async unlikeReview(params: {
+    reviewId: string;
+    userId: string;
+  }): Promise<void> {
     const { reviewId, userId } = params;
 
     const existingReview = await db.query.reviews.findFirst({
@@ -414,39 +479,17 @@ export const reviewService = {
     });
   },
 
+  /* ============================================
+   *           REVIEW REPLY OPERATIONS
+   * ============================================ */
+
   /**
-   * Deletes a review for the user and recalculates average rating
-   * @param params - object containing reviewId and userId
-   * @returns {Promise<void>}
-   * @throws {NotFoundError} if review does not exist
-   * @throws {ForbiddenError} if review does not belong to current user
+   * Adds reply to the review
+   * @param params - object containing reviewId, userId, and replyText
+   * @throws {NotFoundError} - if review does not exist
+   * @throws {InternalError} - if replying or fetching user data fails
+   * @returns {replyResponse}
    */
-
-  async deleteReview(params: {
-    reviewId: string;
-    userId: string;
-  }): Promise<void> {
-    const { reviewId, userId } = params;
-
-    const existingReview = await db.query.reviews.findFirst({
-      where: eq(reviews.id, reviewId),
-    });
-
-    if (!existingReview) {
-      throw new NotFoundError('Review does not exist!');
-    }
-
-    if (existingReview.userId !== userId) {
-      throw new ForbiddenError('Review does not belong to this user');
-    }
-
-    await db.transaction(async (tx) => {
-      await tx.delete(reviews).where(eq(reviews.id, reviewId));
-      await this._calculateAndUpdateRating(tx, existingReview.resourceId);
-    });
-  },
-
-  /* reply to review */
 
   async addReply(params: {
     reviewId: string;
@@ -494,12 +537,21 @@ export const reviewService = {
     };
   },
 
+  /**
+   * Updates existing reply with ownership check
+   * @param params - object containing reviewId, userId, replyId, and updated replyText
+   * @throws {NotFoundError} - if review or reply does not exist
+   * @throws {ForbiddenError} - if reply does not belong to current user
+   * @throws {InternalError} - if updating reply fails
+   * @returns {ReviewReply}
+   */
+
   async updateReply(params: {
     reviewId: string;
     userId: string;
     replyId: string;
     replyText: string;
-  }): Promise<ReviewRelply> {
+  }): Promise<ReviewReply> {
     const { reviewId, userId, replyText, replyId } = params;
 
     const existingReview = await db.query.reviews.findFirst({
@@ -540,6 +592,12 @@ export const reviewService = {
 
     return updatedReply;
   },
+
+  /**
+   * Retrieves all the replies on the review in paginated format
+   * @param params - object containing reviewId, page and limit for pagination
+   * @returns {paginatedRepliesResponse}
+   */
 
   async getAllReplies(params: {
     reviewId: string;
@@ -587,6 +645,13 @@ export const reviewService = {
       },
     };
   },
+
+  /**
+   * Deletes reply with ownership check
+   * @param params - object containing userId, and replyId
+   * @throws {NotFoundError} - if reply does not exist
+   * @throws {ForbiddenError} - if reply does not belong to current user
+   */
 
   async deleteReply(params: {
     replyId: string;

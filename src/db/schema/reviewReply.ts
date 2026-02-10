@@ -16,4 +16,4 @@ export const reviewReply = pgTable('reviewReply', {
 });
 
 export type NewReviewReplyInput = typeof reviewReply.$inferInsert;
-export type ReviewRelply = typeof reviewReply.$inferSelect;
+export type ReviewReply = typeof reviewReply.$inferSelect;
