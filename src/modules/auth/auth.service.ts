@@ -1,6 +1,4 @@
-import { eq, or } from 'drizzle-orm';
-import { db } from '../../db';
-import { User, users } from '../../db/schema';
+import { UserData } from '../../db/schema';
 import { SignInInput, SignUpInput } from './auth.schema';
 import {
   ConflictError,
@@ -16,6 +14,7 @@ import {
 } from '../../utils/generateToken';
 import jwt from 'jsonwebtoken';
 import authConfig from '../../config/auth.config';
+import { userRepository } from '../users/user.repository';
 
 export const authService = {
   /**
@@ -26,13 +25,13 @@ export const authService = {
    * @returns userData excluding password
    */
 
-  async signUp(data: SignUpInput): Promise<Omit<User, 'password'>> {
+  async signUp(data: SignUpInput): Promise<Omit<UserData, 'password'>> {
     const { name, username, email, password } = data;
 
-    const [existingUser] = await db
-      .select()
-      .from(users)
-      .where(or(eq(users.email, email), eq(users.username, username)));
+    const existingUser = await userRepository.findByEmailOrUsername(
+      email,
+      username
+    );
 
     if (existingUser) {
       throw new ConflictError('User already exists!');
@@ -40,16 +39,13 @@ export const authService = {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const [newUser] = await db
-      .insert(users)
-      .values({
-        name,
-        username,
-        email,
-        password: hashedPassword,
-        role: 'user',
-      })
-      .returning();
+    const newUser = await userRepository.create({
+      name,
+      username,
+      email,
+      password: hashedPassword,
+      role: 'user',
+    });
 
     if (!newUser) {
       throw new InternalError('Failed to register user');
@@ -70,11 +66,11 @@ export const authService = {
   async signIn(data: SignInInput): Promise<{
     accessToken: string;
     refreshToken: string;
-    userData: Omit<User, 'password' | 'refreshToken'>;
+    userData: Omit<UserData, 'password' | 'refreshToken'>;
   }> {
     const { email, password } = data;
 
-    const [user] = await db.select().from(users).where(eq(users.email, email));
+    const user = await userRepository.findByEmail(email);
 
     if (!user) {
       throw new InvalidCredentialError('Invalid email or password');
@@ -89,10 +85,7 @@ export const authService = {
     const accessToken = generateAccessToken(user.id, user.role);
     const refreshToken = generateRefreshToken(user.id);
 
-    await db
-      .update(users)
-      .set({ refreshToken: refreshToken })
-      .where(eq(users.id, user.id));
+    await userRepository.updateRefreshToken(refreshToken, user.id);
 
     const {
       password: _password,
@@ -109,10 +102,7 @@ export const authService = {
    */
 
   async signOut(userId: string): Promise<void> {
-    await db
-      .update(users)
-      .set({ refreshToken: null })
-      .where(eq(users.id, userId));
+    await userRepository.clearRefreshToken(userId);
   },
 
   /**
@@ -132,7 +122,7 @@ export const authService = {
 
     const userId = decode.userId;
 
-    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    const user = await userRepository.findById(userId);
 
     if (!user) {
       throw new NotFoundError('User does not exists');
@@ -146,10 +136,7 @@ export const authService = {
 
     const newRefreshToken = generateRefreshToken(user.id);
 
-    await db
-      .update(users)
-      .set({ refreshToken: newRefreshToken })
-      .where(eq(users.id, user.id));
+    await userRepository.updateRefreshToken(newRefreshToken, user.id);
 
     return { accessToken, refreshToken: newRefreshToken };
   },
