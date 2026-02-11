@@ -27,7 +27,7 @@ export const users = pgTable(
 );
 
 // type for data coming out of database after querying
-export type User = typeof users.$inferSelect;
+export type UserData = typeof users.$inferSelect;
 
 // type for data going inside database
-export type NewUser = typeof users.$inferInsert;
+export type CreateUserData = typeof users.$inferInsert;
