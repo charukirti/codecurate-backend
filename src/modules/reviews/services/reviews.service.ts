@@ -1,6 +1,5 @@
-import { eq, inArray } from 'drizzle-orm';
 import { db } from '../../../db';
-import { reviewTags, Tags, tags } from '../../../db/schema';
+import { Tags } from '../../../db/schema';
 import {
   PaginatedReviewsResponse,
   reviewData,
@@ -18,6 +17,8 @@ import {
 import { SortType } from '../../../shared/schema';
 import { reviewsRepository } from '../repositories/reviews.repository';
 import { resourceRepository } from '../../resource/resource.repository';
+import { reviewTagsRepository } from '../repositories/reviewTags.repository';
+import { tagsRepository } from '../repositories/tags.repository';
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
@@ -37,9 +38,10 @@ export const reviewService = {
     tx: Transaction,
     resourceId: string
   ): Promise<void> {
-    const result = await reviewsRepository.calculateAvgRating(tx, resourceId);
-
-    const newAverage = result ? String(Number(result).toFixed(1)) : '0';
+    const newAverage = await reviewsRepository.calculateAvgRating(
+      tx,
+      resourceId
+    );
 
     await resourceRepository.updateAvgRating(newAverage, resourceId, tx);
   },
@@ -51,7 +53,7 @@ export const reviewService = {
    */
 
   async getAllTags(): Promise<Tags[]> {
-    const allTags = await db.select().from(tags);
+    const allTags = await tagsRepository.findAll();
     if (!allTags || allTags.length === 0) {
       throw new NotFoundError('Tags does not exist');
     }
@@ -90,10 +92,7 @@ export const reviewService = {
       throw new ConflictError('Review already exists');
     }
 
-    const validTags = await db
-      .select()
-      .from(tags)
-      .where(inArray(tags.id, tagIds));
+    const validTags = await tagsRepository.findByIds(tagIds);
 
     if (validTags.length !== tagIds.length) {
       throw new ValidationError('Tags are not valid');
@@ -106,12 +105,7 @@ export const reviewService = {
         throw new InternalError('Failed to create review');
       }
 
-      await tx.insert(reviewTags).values(
-        tagIds.map((tagId) => ({
-          reviewId: newReview.id,
-          tagId: tagId,
-        }))
-      );
+      await reviewTagsRepository.createMany(tx, newReview.id, tagIds);
 
       await this._calculateAndUpdateRating(tx, data.resourceId);
 
@@ -206,10 +200,7 @@ export const reviewService = {
     }
 
     if (data.tagIds) {
-      const validTags = await db
-        .select()
-        .from(tags)
-        .where(inArray(tags.id, data.tagIds));
+      const validTags = await tagsRepository.findByIds(data.tagIds);
 
       if (validTags.length !== data.tagIds.length) {
         throw new ValidationError('Tags are not valid');
@@ -226,14 +217,9 @@ export const reviewService = {
       }
 
       if (data.tagIds) {
-        await tx.delete(reviewTags).where(eq(reviewTags.reviewId, reviewId));
+        await reviewTagsRepository.deleteByReviewId(tx, reviewId);
 
-        await tx.insert(reviewTags).values(
-          data.tagIds.map((tagId) => ({
-            reviewId: reviewId,
-            tagId: tagId,
-          }))
-        );
+        await reviewTagsRepository.createMany(tx, reviewId, data.tagIds);
       }
 
       await this._calculateAndUpdateRating(tx, resourceId);
