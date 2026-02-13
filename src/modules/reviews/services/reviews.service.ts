@@ -1,6 +1,6 @@
-import { and, asc, count, desc, eq, inArray, sql } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { db } from '../../../db';
-import { resources, reviews, reviewTags, Tags, tags } from '../../../db/schema';
+import { reviewTags, Tags, tags } from '../../../db/schema';
 import {
   PaginatedReviewsResponse,
   reviewData,
@@ -16,6 +16,8 @@ import {
   ValidationError,
 } from '../../../shared/errors';
 import { SortType } from '../../../shared/schema';
+import { reviewsRepository } from '../repositories/reviews.repository';
+import { resourceRepository } from '../../resource/resource.repository';
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
@@ -35,23 +37,11 @@ export const reviewService = {
     tx: Transaction,
     resourceId: string
   ): Promise<void> {
-    const [result] = await tx
-      .select({
-        average: sql<string>`avg(${reviews.rating})`,
-      })
-      .from(reviews)
-      .where(eq(reviews.resourceId, resourceId));
+    const result = await reviewsRepository.calculateAvgRating(tx, resourceId);
 
-    const newAverage = result?.average
-      ? String(Number(result.average).toFixed(1))
-      : '0';
+    const newAverage = result ? String(Number(result).toFixed(1)) : '0';
 
-    await tx
-      .update(resources)
-      .set({
-        avgRating: newAverage,
-      })
-      .where(eq(resources.id, resourceId));
+    await resourceRepository.updateAvgRating(newAverage, resourceId, tx);
   },
 
   /**
@@ -83,23 +73,18 @@ export const reviewService = {
    */
 
   async createReview(data: reviewData): Promise<ReviewResponse> {
-    const { userId, resourceId, rating, reviewText, tagIds } = data;
+    const { userId, resourceId, tagIds } = data;
 
-    const [existingResource] = await db
-      .select()
-      .from(resources)
-      .where(eq(resources.id, resourceId));
+    const existingResource = await resourceRepository.findById(resourceId);
 
     if (!existingResource) {
       throw new NotFoundError('Video or Playlist does not found');
     }
 
-    const existingReview = await db.query.reviews.findFirst({
-      where: and(
-        eq(reviews.userId, userId),
-        eq(reviews.resourceId, resourceId)
-      ),
-    });
+    const existingReview = await reviewsRepository.findByUserAndResource(
+      userId,
+      resourceId
+    );
 
     if (existingReview) {
       throw new ConflictError('Review already exists');
@@ -115,15 +100,7 @@ export const reviewService = {
     }
 
     const createdReview = await db.transaction(async (tx) => {
-      const [newReview] = await tx
-        .insert(reviews)
-        .values({
-          userId,
-          resourceId,
-          reviewText,
-          rating,
-        })
-        .returning();
+      const newReview = await reviewsRepository.create(tx, data);
 
       if (!newReview) {
         throw new InternalError('Failed to create review');
@@ -138,20 +115,8 @@ export const reviewService = {
 
       await this._calculateAndUpdateRating(tx, data.resourceId);
 
-      const reviewWithTags = await tx.query.reviews.findFirst({
-        where: eq(reviews.id, newReview.id),
-        with: {
-          user: {
-            columns: { id: true, username: true },
-          },
-
-          reviewTags: {
-            with: {
-              tag: true,
-            },
-          },
-        },
-      });
+      const reviewWithTags =
+        await reviewsRepository.findReviewWithIdAndRelations(newReview.id, tx);
 
       if (!reviewWithTags) {
         throw new InternalError('Failed to fetch the created review');
@@ -183,27 +148,12 @@ export const reviewService = {
 
     const offset = (page - 1) * limit;
 
-    const sortMapping = {
-      newest: desc(reviews.createdAt),
-      oldest: asc(reviews.createdAt),
-      highest: desc(reviews.rating),
-      lowest: asc(reviews.rating),
-    };
-
-    const allReviews = await db.query.reviews.findMany({
-      where: eq(reviews.resourceId, resourceId),
-      limit: limit,
-      offset: offset,
-      orderBy: sortMapping[sort],
-      with: {
-        user: {
-          columns: { id: true, username: true },
-        },
-        reviewTags: {
-          with: { tag: true },
-        },
-      },
-    });
+    const allReviews = await reviewsRepository.getAllPaginated(
+      resourceId,
+      sort,
+      limit,
+      offset
+    );
 
     const reviewsWithTags = allReviews.map((review) => ({
       ...review,
@@ -211,12 +161,9 @@ export const reviewService = {
       tags: review.reviewTags.map((rt) => rt.tag),
     }));
 
-    const [countResult] = await db
-      .select({ count: count() })
-      .from(reviews)
-      .where(eq(reviews.resourceId, resourceId));
+    const countResult = await reviewsRepository.countByResourceId(resourceId);
 
-    const totalItems = Number(countResult?.count || 0);
+    const totalItems = Number(countResult || 0);
 
     const totalPages = Math.ceil(totalItems / limit);
 
@@ -248,16 +195,7 @@ export const reviewService = {
   }): Promise<ReviewResponse> {
     const { userId, resourceId, reviewId, data } = params;
 
-    const existingReview = await db.query.reviews.findFirst({
-      where: eq(reviews.id, reviewId),
-      with: {
-        reviewTags: {
-          with: {
-            tag: true,
-          },
-        },
-      },
-    });
+    const existingReview = await reviewsRepository.findById(reviewId);
 
     if (!existingReview) {
       throw new NotFoundError('Review does not exist');
@@ -279,16 +217,10 @@ export const reviewService = {
     }
 
     const updatedReview = await db.transaction(async (tx) => {
-      const [updatedReview] = await tx
-        .update(reviews)
-        .set({
-          reviewText: data.reviewText,
-          rating: data.rating,
-          updatedAt: new Date(),
-        })
-        .where(eq(reviews.id, reviewId))
-        .returning();
-
+      const updatedReview = await reviewsRepository.update(tx, reviewId, {
+        reviewText: data?.reviewText,
+        rating: data.rating,
+      });
       if (!updatedReview) {
         throw new InternalError('Failed to create review');
       }
@@ -306,22 +238,11 @@ export const reviewService = {
 
       await this._calculateAndUpdateRating(tx, resourceId);
 
-      const updatedReviewWithTags = await tx.query.reviews.findFirst({
-        where: eq(reviews.id, reviewId),
-        with: {
-          user: {
-            columns: {
-              id: true,
-              username: true,
-            },
-          },
-          reviewTags: {
-            with: {
-              tag: true,
-            },
-          },
-        },
-      });
+      const updatedReviewWithTags =
+        await reviewsRepository.findReviewWithIdAndRelations(
+          updatedReview.id,
+          tx
+        );
 
       if (!updatedReviewWithTags) {
         throw new InternalError('Failed to fetch the updated review');
@@ -351,9 +272,7 @@ export const reviewService = {
   }): Promise<void> {
     const { reviewId, userId } = params;
 
-    const existingReview = await db.query.reviews.findFirst({
-      where: eq(reviews.id, reviewId),
-    });
+    const existingReview = await reviewsRepository.findById(reviewId);
 
     if (!existingReview) {
       throw new NotFoundError('Review does not exist!');
@@ -364,7 +283,7 @@ export const reviewService = {
     }
 
     await db.transaction(async (tx) => {
-      await tx.delete(reviews).where(eq(reviews.id, reviewId));
+      await reviewsRepository.delete(tx, reviewId);
       await this._calculateAndUpdateRating(tx, existingReview.resourceId);
     });
   },
