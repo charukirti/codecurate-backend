@@ -1,12 +1,13 @@
-import { desc, eq, count } from 'drizzle-orm';
-import { db } from '../../../db';
-import { ReviewReply, reviewReply, reviews, users } from '../../../db/schema';
+import { ReviewReply } from '../../../db/schema';
 import { paginatedRepliesResponse, replyResponse } from '../reviews.types';
 import {
   ForbiddenError,
   InternalError,
   NotFoundError,
 } from '../../../shared/errors';
+import { reviewsRepository } from '../repositories/reviews.repository';
+import { reviewsReplyRepository } from '../repositories/reply.repository';
+import { userRepository } from '../../users/user.repository';
 
 export const reviewReplyService = {
   /* ============================================
@@ -28,40 +29,31 @@ export const reviewReplyService = {
   }): Promise<replyResponse> {
     const { reviewId, replyText, userId } = params;
 
-    const existingReview = await db.query.reviews.findFirst({
-      where: eq(reviews.id, reviewId),
-      columns: { id: true },
-    });
+    const existingReview = await reviewsRepository.findById(reviewId);
 
     if (!existingReview) {
       throw new NotFoundError('Review does not exist');
     }
 
-    const [reply] = await db
-      .insert(reviewReply)
-      .values({
-        userId: userId,
-        reviewId: existingReview.id,
-        replyText: replyText,
-      })
-      .returning();
+    const reply = await reviewsReplyRepository.create(
+      userId,
+      reviewId,
+      replyText
+    );
 
     if (!reply) {
       throw new InternalError('Unable to add reply');
     }
 
-    const [user] = await db
-      .select({ username: users.username })
-      .from(users)
-      .where(eq(users.id, userId));
+    const username = await userRepository.findUsernameById(userId);
 
-    if (!user) {
+    if (!username) {
       throw new InternalError('Unable to fetch user');
     }
 
     return {
       id: reply.id,
-      username: user.username,
+      username: username,
       replyText: reply.replyText,
       createdAt: reply.createdAt,
     };
@@ -84,19 +76,13 @@ export const reviewReplyService = {
   }): Promise<ReviewReply> {
     const { reviewId, userId, replyText, replyId } = params;
 
-    const existingReview = await db.query.reviews.findFirst({
-      where: eq(reviews.id, reviewId),
-      columns: { id: true },
-    });
+    const existingReview = await reviewsRepository.findById(reviewId);
 
     if (!existingReview) {
       throw new NotFoundError('Review does not exist');
     }
 
-    const existingReply = await db.query.reviewReply.findFirst({
-      where: eq(reviewReply.id, replyId),
-      columns: { id: true, userId: true, reviewId: true },
-    });
+    const existingReply = await reviewsReplyRepository.findById(replyId);
 
     if (!existingReply) {
       throw new NotFoundError('Reply does not exist');
@@ -110,11 +96,10 @@ export const reviewReplyService = {
       throw new NotFoundError('Reply does not belong to this review');
     }
 
-    const [updatedReply] = await db
-      .update(reviewReply)
-      .set({ replyText: replyText, updatedAt: new Date() })
-      .where(eq(reviewReply.id, replyId))
-      .returning();
+    const updatedReply = await reviewsReplyRepository.update(
+      existingReply.id,
+      replyText
+    );
 
     if (!updatedReply) {
       throw new InternalError('Failed to update the reply');
@@ -137,32 +122,15 @@ export const reviewReplyService = {
     const { reviewId, page, limit } = params;
     const offset = (page - 1) * limit;
 
-    const replies = await db.query.reviewReply.findMany({
-      where: eq(reviewReply.reviewId, reviewId),
-      orderBy: desc(reviewReply.createdAt),
-      offset: offset,
-      limit: limit,
-      columns: {
-        id: true,
-        replyText: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-      with: {
-        user: {
-          columns: {
-            username: true,
-          },
-        },
-      },
-    });
+    const replies = await reviewsReplyRepository.getAllPaginated(
+      reviewId,
+      limit,
+      offset
+    );
 
-    const [countResult] = await db
-      .select({ count: count() })
-      .from(reviewReply)
-      .where(eq(reviewReply.reviewId, reviewId));
+    const countResult = await reviewsReplyRepository.countByReviewId(reviewId);
 
-    const totalItems = Number(countResult?.count || 0);
+    const totalItems = Number(countResult || 0);
 
     const totalPages = Math.ceil(totalItems / limit);
 
@@ -189,10 +157,7 @@ export const reviewReplyService = {
   }): Promise<void> {
     const { userId, replyId } = params;
 
-    const reply = await db.query.reviewReply.findFirst({
-      where: eq(reviewReply.id, replyId),
-      columns: { id: true, userId: true },
-    });
+    const reply = await reviewsReplyRepository.findById(replyId);
 
     if (!reply) {
       throw new NotFoundError('Reply does not exist');
@@ -202,6 +167,6 @@ export const reviewReplyService = {
       throw new ForbiddenError('Reply does not belong to this user');
     }
 
-    await db.delete(reviewReply).where(eq(reviewReply.id, replyId));
+    await reviewsReplyRepository.delete(reply.id);
   },
 };

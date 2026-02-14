@@ -67,4 +67,13 @@ export const userRepository = {
 
     return user;
   },
+
+  async findUsernameById(id: string) {
+    const [user] = await db
+      .select({ username: users.username })
+      .from(users)
+      .where(eq(users.id, id));
+
+    return user?.username;
+  },
 };

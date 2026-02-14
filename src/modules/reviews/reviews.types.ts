@@ -71,3 +71,22 @@ export type ReviewWithRelations = Reviews & {
     tag: Tags;
   }[];
 };
+
+/* ---------- review reply repository types -------- */
+
+export type ReplyWithUser = {
+  id: string;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+  replyText: string;
+  user: {
+    id: string;
+    username: string;
+  };
+};
+
+export type reply = {
+  id: string;
+  userId: string;
+  reviewId: string;
+};
