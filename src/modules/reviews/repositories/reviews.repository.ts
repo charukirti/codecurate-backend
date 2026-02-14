@@ -149,4 +149,20 @@ export const reviewsRepository = {
 
     return Number(countResult?.count ?? 0);
   },
+
+  async incrementLikeCount(tx: Transaction, reviewId: string): Promise<void> {
+    await tx
+      .update(reviews)
+      .set({ reviewLikeCount: sql`${reviews.reviewLikeCount} + 1` })
+      .where(eq(reviews.id, reviewId));
+  },
+
+  async decrementLikeCount(tx: Transaction, reviewId: string): Promise<void> {
+    await tx
+      .update(reviews)
+      .set({
+        reviewLikeCount: sql`GREATEST(${reviews.reviewLikeCount} - 1, 0)`,
+      })
+      .where(eq(reviews.id, reviewId));
+  },
 };

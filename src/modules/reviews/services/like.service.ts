@@ -1,7 +1,7 @@
-import { and, eq, sql } from 'drizzle-orm';
 import { db } from '../../../db';
-import { reviewLikes, reviews } from '../../../db/schema';
 import { ConflictError, NotFoundError } from '../../../shared/errors';
+import { reviewsRepository } from '../repositories/reviews.repository';
+import { reviewLikeRepository } from '../repositories/reviewLike.repository';
 
 export const reviewLikeService = {
   /**
@@ -18,18 +18,12 @@ export const reviewLikeService = {
   }): Promise<void> {
     const { userId, reviewId } = params;
 
-    const existingReview = await db.query.reviews.findFirst({
-      where: eq(reviews.id, reviewId),
-      columns: { id: true },
-    });
+    const existingReview = await reviewsRepository.findById(reviewId);
 
-    const existingLike = await db.query.reviewLikes.findFirst({
-      where: and(
-        eq(reviewLikes.userId, userId),
-        eq(reviewLikes.reviewId, reviewId)
-      ),
-      columns: { id: true },
-    });
+    const existingLike = await reviewLikeRepository.findByReviewAndUser(
+      reviewId,
+      userId
+    );
 
     if (!existingReview) {
       throw new NotFoundError('Review does not exist');
@@ -40,15 +34,9 @@ export const reviewLikeService = {
     }
 
     await db.transaction(async (tx) => {
-      await tx.insert(reviewLikes).values({
-        userId,
-        reviewId,
-      });
+      await reviewLikeRepository.create(reviewId, userId, tx);
 
-      await tx
-        .update(reviews)
-        .set({ reviewLikeCount: sql`${reviews.reviewLikeCount} +1` })
-        .where(eq(reviews.id, reviewId));
+      await reviewsRepository.incrementLikeCount(tx, reviewId);
     });
   },
 
@@ -65,36 +53,18 @@ export const reviewLikeService = {
   }): Promise<void> {
     const { reviewId, userId } = params;
 
-    const existingReview = await db.query.reviews.findFirst({
-      where: eq(reviews.id, reviewId),
-      columns: { id: true },
-    });
-
-    if (!existingReview) {
-      throw new NotFoundError('Review does not exist');
-    }
-
-    const existingLike = await db.query.reviewLikes.findFirst({
-      where: and(
-        eq(reviewLikes.reviewId, reviewId),
-        eq(reviewLikes.userId, userId)
-      ),
-      columns: { id: true },
-    });
+    const existingLike = await reviewLikeRepository.findByReviewAndUser(
+      reviewId,
+      userId
+    );
 
     if (!existingLike) {
       return;
     }
 
     await db.transaction(async (tx) => {
-      await tx.delete(reviewLikes).where(eq(reviewLikes.id, existingLike.id));
-
-      await tx
-        .update(reviews)
-        .set({
-          reviewLikeCount: sql`GREATEST(${reviews.reviewLikeCount} - 1, 0)`,
-        })
-        .where(eq(reviews.id, reviewId));
+      await reviewLikeRepository.delete(existingLike.id, tx);
+      await reviewsRepository.decrementLikeCount(tx, reviewId);
     });
   },
 };
