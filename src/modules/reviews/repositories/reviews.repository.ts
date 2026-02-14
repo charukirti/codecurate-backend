@@ -165,4 +165,53 @@ export const reviewsRepository = {
       })
       .where(eq(reviews.id, reviewId));
   },
+
+  async findUsersReviews(
+    userId: string,
+    sort: SortType,
+    limit: number,
+    offset: number
+  ) {
+    const sortMapping = {
+      newest: desc(reviews.createdAt),
+      oldest: asc(reviews.createdAt),
+      highest: desc(reviews.rating),
+      lowest: asc(reviews.rating),
+    };
+
+    const userReviews = await db.query.reviews.findMany({
+      where: eq(reviews.userId, userId),
+      limit: limit,
+      offset: offset,
+      orderBy: sortMapping[sort],
+      with: {
+        resource: {
+          columns: {
+            id: true,
+            title: true,
+            thumbnails: true,
+            avgRating: true,
+            type: true,
+          },
+        },
+
+        reviewTags: {
+          with: {
+            tag: true,
+          },
+        },
+      },
+    });
+
+    return userReviews;
+  },
+
+  async countByUserId(userId: string) {
+    const [reviewCount] = await db
+      .select({ count: count() })
+      .from(reviews)
+      .where(eq(reviews.userId, userId));
+
+    return Number(reviewCount?.count || 0);
+  },
 };

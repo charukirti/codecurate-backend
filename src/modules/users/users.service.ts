@@ -1,10 +1,9 @@
-import { asc, count, desc, eq } from 'drizzle-orm';
-import { db } from '../../db';
-import { reviews, UserData, users } from '../../db/schema';
+import { UserData } from '../../db/schema';
 import { ConflictError, NotFoundError } from '../../shared/errors';
 import { UpdateUserInput } from './users.schema';
 import { SortType } from '../../shared/schema';
 import { userRepository } from './user.repository';
+import { reviewsRepository } from '../reviews/repositories/reviews.repository';
 
 export const userService = {
   /**
@@ -78,52 +77,21 @@ export const userService = {
 
     const offset = (page - 1) * limit;
 
-    const sortMapping = {
-      newest: desc(reviews.createdAt),
-      oldest: asc(reviews.createdAt),
-      highest: desc(reviews.rating),
-      lowest: asc(reviews.rating),
-    };
-
-    const [existingUser] = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.username, username));
+    const existingUser = await userRepository.findByUsername(username);
 
     if (!existingUser) {
       throw new NotFoundError('User does not exist.');
     }
 
-    const userReviews = await db.query.reviews.findMany({
-      where: eq(reviews.userId, existingUser.id),
-      limit: limit,
-      offset: offset,
-      orderBy: sortMapping[sort],
-      with: {
-        resource: {
-          columns: {
-            id: true,
-            title: true,
-            thumbnails: true,
-            avgRating: true,
-            type: true,
-          },
-        },
+    const userReviews = await reviewsRepository.findUsersReviews(
+      existingUser.id,
+      sort,
+      limit,
+      offset
+    );
 
-        reviewTags: {
-          with: {
-            tag: true,
-          },
-        },
-      },
-    });
+    const totalItems = await reviewsRepository.countByUserId(existingUser.id);
 
-    const [reviewCount] = await db
-      .select({ count: count() })
-      .from(reviews)
-      .where(eq(reviews.userId, existingUser.id));
-
-    const totalItems = Number(reviewCount?.count || 0);
     const totalPages = Math.ceil(totalItems / limit);
 
     return {
