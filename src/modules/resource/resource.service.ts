@@ -3,6 +3,7 @@ import {
   ConflictError,
   InternalError,
   NotFoundError,
+  ValidationError,
 } from '../../shared/errors';
 import {
   PlaylistAPIResponse,
@@ -12,6 +13,7 @@ import { ResourceWithStats, StatsData } from './resource.types';
 import { statsCache } from './resource.utils';
 import { youtubeApiService } from './youtubeapi.service';
 import { resourceRepository } from './resource.repository';
+import { extractVideoUrl } from '../../utils/extractVideoUrl';
 
 export const resourceService = {
   /**
@@ -78,6 +80,59 @@ export const resourceService = {
       instructorName: instructorName || youtubeData.channelName,
       description: description || null,
     };
+  },
+
+  /**
+   * Main entry point for adding a resource.
+   * Handles URL parsing, fetching data from YouTube, and saving to DB.
+   */
+
+  async extractFromUrl(input: {
+    url: string;
+    codeLang?: string;
+    videoLang: string;
+    topic: string;
+    resourceType: 'video' | 'playlist';
+    instructorName: string;
+    description?: string;
+  }): Promise<Resource> {
+    const { videoId, playlistId } = extractVideoUrl(input.url);
+
+    let youtubeData;
+    let resourceData: NewResource;
+
+    if (videoId) {
+      youtubeData = await youtubeApiService.getVideoDetails(videoId);
+
+      resourceData = this.prepareVideoData(
+        youtubeData,
+        input.videoLang,
+        input.topic,
+        input.resourceType,
+        videoId,
+        input.instructorName,
+        input.codeLang,
+        input.description
+      );
+    } else if (playlistId) {
+      youtubeData = await youtubeApiService.getPlaylistDetails(playlistId);
+      resourceData = resourceService.preparePlaylistResource(
+        youtubeData,
+        playlistId,
+        input.topic,
+        input.videoLang,
+        input.resourceType,
+        input.instructorName,
+        input.codeLang,
+        input.description
+      );
+    } else {
+      throw new ValidationError(
+        'Invalid YouTube URL. Could not extract Video or Playlist ID.'
+      );
+    }
+
+    return await this.createResource(resourceData);
   },
 
   /**

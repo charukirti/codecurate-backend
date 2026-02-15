@@ -4,8 +4,6 @@ import {
   getResourceByIdParam,
   getResourcesQuerySchema,
 } from './resource.schema';
-import { extractVideoUrl } from '../../utils/extractVideoUrl';
-import { youtubeApiService } from './youtubeapi.service';
 import { resourceService } from './resource.service';
 import { ValidationError } from '../../shared/errors';
 
@@ -15,56 +13,10 @@ export async function createResource(
   next: NextFunction
 ) {
   try {
-    const {
-      url,
-      codeLang,
-      videoLang,
-      topic,
-      resourceType,
-      instructorName,
-      description,
-    } = req.body;
-
-    const { videoId, playlistId } = extractVideoUrl(url);
-
-    let youtubeData;
-    let savedResource;
-
-    if (videoId) {
-      youtubeData = await youtubeApiService.getVideoDetails(videoId);
-
-      const resourceData = resourceService.prepareVideoData(
-        youtubeData,
-        videoLang,
-        topic,
-        resourceType,
-        videoId,
-        instructorName,
-        codeLang,
-        description
-      );
-
-      savedResource = await resourceService.createResource(resourceData);
-    } else if (playlistId) {
-      youtubeData = await youtubeApiService.getPlaylistDetails(playlistId);
-
-      const resourceData = resourceService.preparePlaylistResource(
-        youtubeData,
-        playlistId,
-        topic,
-        videoLang,
-        resourceType,
-        instructorName,
-        codeLang,
-        description
-      );
-
-      savedResource = await resourceService.createResource(resourceData);
-    }
+    const savedResource = await resourceService.extractFromUrl(req.body);
 
     res.status(201).json({
-      message: `${videoId ? 'video data extracted successfully' : 'Playlist data extracted successfully'}`,
-
+      message: 'Resource processed and created successfully',
       data: savedResource,
     });
   } catch (error) {
