@@ -1,6 +1,4 @@
-import { and, count, desc, eq, like, ne, notInArray, or } from 'drizzle-orm';
-import { db } from '../../db';
-import { NewResource, Resource, resources } from '../../db/schema';
+import { NewResource, Resource } from '../../db/schema';
 import {
   ConflictError,
   InternalError,
@@ -13,6 +11,7 @@ import {
 import { ResourceWithStats, StatsData } from './resource.types';
 import { statsCache } from './resource.utils';
 import { youtubeApiService } from './youtubeapi.service';
+import { resourceRepository } from './resource.repository';
 
 export const resourceService = {
   /**
@@ -91,26 +90,24 @@ export const resourceService = {
    */
 
   async createResource(data: NewResource): Promise<Resource> {
-    const conditions = [];
+    // const conditions = [];
+    let existingResource;
 
     if (data.videoId) {
-      conditions.push(eq(resources.videoId, data.videoId));
+      existingResource = await resourceRepository.findByVideoId(data.videoId);
     }
     if (data.playlistId) {
-      conditions.push(eq(resources.playlistId, data.playlistId));
+      existingResource = await resourceRepository.findByPlaylistId(
+        data.playlistId
+      );
     }
-
-    const [existingResource] = await db
-      .select()
-      .from(resources)
-      .where(or(...conditions));
 
     if (existingResource) {
       const resourceType = data.type === 'video' ? 'Video' : 'Playlist';
       throw new ConflictError(`${resourceType} already exists`);
     }
 
-    const [newResource] = await db.insert(resources).values(data).returning();
+    const newResource = await resourceRepository.create(data);
 
     if (!newResource) {
       throw new InternalError(
@@ -140,46 +137,20 @@ export const resourceService = {
     const { page, limit, codeLang, topic, type, search } = params;
     const offset = (page - 1) * limit;
 
-    let conditions = [];
+    const totalItems = await resourceRepository.countResources({
+      codeLang,
+      topic,
+      type,
+      search,
+    });
 
-    if (codeLang) {
-      conditions.push(eq(resources.codeLang, codeLang));
-    }
-
-    if (topic) {
-      conditions.push(eq(resources.topic, topic));
-    }
-
-    if (type) {
-      conditions.push(eq(resources.type, type));
-    }
-
-    if (search?.trim()) {
-      const searchTerm = `%${search}%`;
-      conditions.push(
-        or(
-          like(resources.title, searchTerm),
-          like(resources.channelName, searchTerm)
-        )
-      );
-    }
-
-    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
-
-    const [countResult] = await db
-      .select({ count: count() })
-      .from(resources)
-      .where(whereClause);
-
-    const totalItems = Number(countResult?.count || 0);
-
-    const data = await db
-      .select()
-      .from(resources)
-      .where(whereClause)
-      .limit(limit)
-      .offset(offset)
-      .orderBy(desc(resources.createdAt));
+    const data = await resourceRepository.findAllPaginated({
+      search,
+      topic,
+      type,
+      limit,
+      offset,
+    });
 
     const totalPages = Math.ceil(totalItems / limit);
 
@@ -201,10 +172,7 @@ export const resourceService = {
    */
 
   async getResourceById(id: string): Promise<ResourceWithStats> {
-    const [resource] = await db
-      .select()
-      .from(resources)
-      .where(eq(resources.id, id));
+    const resource = await resourceRepository.findById(id);
 
     if (!resource) {
       throw new NotFoundError('Resource not found');
@@ -242,48 +210,32 @@ export const resourceService = {
    */
 
   async getRelatedResources(id: string): Promise<Resource[]> {
-    const [currentResource] = await db
-      .select({
-        id: resources.id,
-        topic: resources.topic,
-        codeLang: resources.codeLang,
-      })
-      .from(resources)
-      .where(eq(resources.id, id));
+    const currentResource = await resourceRepository.findBasicById(id);
 
     if (!currentResource) {
       throw new NotFoundError('Resource does not exist.');
     }
 
-    const conditions = [
-      eq(resources.topic, currentResource.topic),
-      ne(resources.id, currentResource.id),
-    ];
+    let relatedResources: Resource[] = [];
 
     if (currentResource.codeLang) {
-      conditions.push(eq(resources.codeLang, currentResource.codeLang));
+      relatedResources = await resourceRepository.findRelatedByTopicAndCodeLang(
+        currentResource.id,
+        currentResource.topic,
+        currentResource.codeLang,
+        4
+      );
     }
-
-    let relatedResources = await db.query.resources.findMany({
-      where: and(...conditions),
-      limit: 4,
-      orderBy: desc(resources.avgRating),
-    });
 
     if (relatedResources.length < 4) {
       const existingIds = relatedResources.map((resource) => resource.id);
 
-      const tierTwoConditions = [
-        eq(resources.topic, currentResource.topic),
-        ne(resources.id, currentResource.id),
-        notInArray(resources.id, existingIds),
-      ];
-
-      const additionalResources = await db.query.resources.findMany({
-        where: and(...tierTwoConditions),
-        limit: 4 - relatedResources.length,
-        orderBy: desc(resources.avgRating),
-      });
+      const additionalResources = await resourceRepository.findRelatedByTopic(
+        currentResource.id,
+        currentResource.topic,
+        existingIds,
+        4 - relatedResources.length
+      );
 
       // merge with previously found array
 
@@ -295,17 +247,13 @@ export const resourceService = {
     if (relatedResources.length < 4) {
       const existingIds = relatedResources.map((resource) => resource.id);
 
-      const anyTopRatedResources = await db.query.resources.findMany({
-        where: and(
-          ne(resources.id, currentResource.id),
-          notInArray(resources.id, existingIds)
-        ),
+      const additionalResources = await resourceRepository.findTopRated(
+        currentResource.id,
+        existingIds,
+        4 - relatedResources.length
+      );
 
-        limit: 4 - relatedResources.length,
-        orderBy: desc(resources.avgRating),
-      });
-
-      relatedResources = [...relatedResources, ...anyTopRatedResources];
+      relatedResources = [...relatedResources, ...additionalResources];
     }
 
     return relatedResources;
@@ -318,10 +266,7 @@ export const resourceService = {
    */
 
   async deleteResourceById(id: string): Promise<void> {
-    const [deletedResource] = await db
-      .delete(resources)
-      .where(eq(resources.id, id))
-      .returning();
+    const deletedResource = await resourceRepository.delete(id);
 
     if (!deletedResource) {
       throw new NotFoundError('Resource not exist');
