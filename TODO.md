@@ -5,6 +5,7 @@
 - [✅] Fix typo in error classes and messages
 - [✅] Remove Non-null assertions and add proper validations
 - [✅] Add JSDoc style comments where necessary
+- [✅] Extract DB logic into repository
 
 # Security Related
 
@@ -33,8 +34,8 @@
 
 ## Reviews module
 
-- [ ] Like review\*
-- [ ] Reply to review\*
+- [✅] Like review\*
+- [✅] Reply to review\*
 - [ ] Report review\*
 - [ ] Badges (e.g. Top review, verified review .etc)\*
 
