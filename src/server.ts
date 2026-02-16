@@ -5,5 +5,17 @@ import Logger from './utils/logger.js';
 const PORT = appConfig.port;
 
 app.listen(PORT, () => {
-  Logger.info(`server is running at port ${PORT}`);
+  Logger.info(`Server running on port ${PORT}`);
+  Logger.info(`Environment: ${appConfig.node_env}`);
+  Logger.info(`Health check: http://localhost:${PORT}/health`);
+});
+
+process.on('SIGTERM', () => {
+  Logger.info('SIGTERM signal received: closing HTTP server');
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  Logger.info('SIGINT signal received: closing HTTP server');
+  process.exit(0);
 });

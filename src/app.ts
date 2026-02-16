@@ -40,7 +40,11 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.get('/health', (req, res) => {
-  res.json({ message: 'Welcome to codecurate backend!' });
+  res.json({
+    message: 'Welcome to codecurate backend!',
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+  });
 });
 
 app.use('/api/v1/auth', authRoutes);
