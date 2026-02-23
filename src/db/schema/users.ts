@@ -6,6 +6,7 @@ import {
   text,
   pgEnum,
   index,
+  boolean,
 } from 'drizzle-orm/pg-core';
 
 export const roleEnum = pgEnum('role_enum', ['user', 'admin']);
@@ -18,6 +19,7 @@ export const users = pgTable(
     username: varchar('username', { length: 100 }).notNull().unique(),
     email: varchar('email', { length: 255 }).notNull().unique(),
     password: varchar('password', { length: 255 }).notNull(),
+    isVerified: boolean('is_verified').default(false),
     role: roleEnum('role').default('user').notNull(),
     refreshToken: text('refresh_token'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
