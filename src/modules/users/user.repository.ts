@@ -1,6 +1,7 @@
 import { eq, or } from 'drizzle-orm';
 import { db } from '../../db';
 import { CreateUserData, UserData, users } from '../../db/schema';
+import { Transaction } from '../reviews/reviews.types';
 
 export const userRepository = {
   async create(data: CreateUserData): Promise<UserData | undefined> {
@@ -75,5 +76,12 @@ export const userRepository = {
       .where(eq(users.id, id));
 
     return user?.username;
+  },
+
+  async updateIsVerifiedById(tx: Transaction, userId: string) {
+    await tx
+      .update(users)
+      .set({ isVerified: true })
+      .where(eq(users.id, userId));
   },
 };

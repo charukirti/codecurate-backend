@@ -37,5 +37,10 @@ export const signInSchema = z.object({
   password: z.string().min(1, 'password is required!'),
 });
 
+export const verifyEmailQuerySchema = z.object({
+  token: z.string('Not a valid uuid'),
+});
+
 export type SignUpInput = z.infer<typeof signUpSchema>;
 export type SignInInput = z.infer<typeof signInSchema>;
+export type verifyEmailQueryInput = z.infer<typeof verifyEmailQuerySchema>;

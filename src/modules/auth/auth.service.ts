@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { UserData } from '../../db/schema';
 import { SignInInput, SignUpInput } from './auth.schema';
 import {
@@ -15,6 +16,11 @@ import {
 import jwt from 'jsonwebtoken';
 import authConfig from '../../config/auth.config';
 import { userRepository } from '../users/user.repository';
+import { db } from '../../db';
+
+import { sendVerificationEmail } from '../../utils/mailer';
+
+import { authRepository } from './auth.repository';
 
 export const authService = {
   /**
@@ -51,9 +57,50 @@ export const authService = {
       throw new InternalError('Failed to register user');
     }
 
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto
+      .createHash('sha256')
+      .update(rawToken)
+      .digest('hex');
+
+    await authRepository.createToken({
+      userId: newUser.id,
+      hashedToken,
+      tokenType: 'email_verification',
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    });
+
+    await sendVerificationEmail(newUser.email, rawToken);
+
     const { password: _, ...userData } = newUser;
 
     return userData;
+  },
+
+  async verifyEmail(rawToken: string) {
+    const hashedToken = crypto
+      .createHash('sha256')
+      .update(rawToken)
+      .digest('hex');
+
+    const token = await authRepository.findByTokenAndType({
+      hashedToken,
+      tokenType: 'email_verification',
+    });
+
+    if (!token) {
+      throw new NotFoundError('Token does not exist');
+    }
+
+    if (!token.expiresAt || token.expiresAt < new Date()) {
+      throw new InvalidCredentialError('Token has expired');
+    }
+
+    await db.transaction(async (tx) => {
+      await userRepository.updateIsVerifiedById(tx, token.userId);
+
+      await authRepository.deleteTokenById(tx, token.id);
+    });
   },
 
   /**

@@ -1,5 +1,9 @@
 import type { Request, Response, NextFunction } from 'express';
-import { SignInInput, SignUpInput } from './auth.schema';
+import {
+  SignInInput,
+  SignUpInput,
+  verifyEmailQuerySchema,
+} from './auth.schema';
 import { authService } from './auth.service';
 import appConfig from '../../config/app.config';
 import { UnauthorizedError } from '../../shared/errors';
@@ -92,6 +96,22 @@ export async function refreshToken(
       message: 'New refresh token generated',
       accessToken,
     });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function verifyEmail(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { token } = verifyEmailQuerySchema.parse(req.query);
+
+    await authService.verifyEmail(token);
+
+    res.status(200).json({ message: 'Email verified successfully' });
   } catch (error) {
     next(error);
   }
