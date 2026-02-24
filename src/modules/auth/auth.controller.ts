@@ -1,5 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import {
+  ForgotPasswordInput,
+  ResetPasswordInput,
   SignInInput,
   SignUpInput,
   verifyEmailQuerySchema,
@@ -112,6 +114,44 @@ export async function verifyEmail(
     await authService.verifyEmail(token);
 
     res.status(200).json({ message: 'Email verified successfully' });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function forgotPassword(
+  req: Request<{}, {}, ForgotPasswordInput>,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { email } = req.body;
+
+    await authService.forgotPassword(email);
+
+    res.status(200).json({
+      message: 'Password reset email sent successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function resetPassword(
+  req: Request<{}, {}, ResetPasswordInput>,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { token } = verifyEmailQuerySchema.parse(req.query);
+
+    const { newPassword } = req.body;
+
+    await authService.resetPassword(token, newPassword);
+
+    res.status(200).json({
+      message: 'Password reseted successfully',
+    });
   } catch (error) {
     next(error);
   }

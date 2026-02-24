@@ -84,4 +84,15 @@ export const userRepository = {
       .set({ isVerified: true })
       .where(eq(users.id, userId));
   },
+
+  async updatePasswordById(
+    tx: Transaction,
+    userId: string,
+    hashedPassword: string
+  ) {
+    await tx
+      .update(users)
+      .set({ password: hashedPassword })
+      .where(eq(users.id, userId));
+  },
 };

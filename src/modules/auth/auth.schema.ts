@@ -41,6 +41,23 @@ export const verifyEmailQuerySchema = z.object({
   token: z.string('Not a valid uuid'),
 });
 
+export const forgotPasswordSchema = z.object({
+  email: z.email({
+    error: (issue) =>
+      issue.input === undefined ? 'Email is required' : 'Invalid email address',
+  }),
+});
+
+export const resetPasswordSchema = z.object({
+  newPassword: z
+    .string()
+    .min(7, 'Password must be at least 7 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number'),
+});
+
 export type SignUpInput = z.infer<typeof signUpSchema>;
 export type SignInInput = z.infer<typeof signInSchema>;
 export type verifyEmailQueryInput = z.infer<typeof verifyEmailQuerySchema>;
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;

@@ -18,7 +18,10 @@ import authConfig from '../../config/auth.config';
 import { userRepository } from '../users/user.repository';
 import { db } from '../../db';
 
-import { sendVerificationEmail } from '../../utils/mailer';
+import {
+  sendPasswordResetEmail,
+  sendVerificationEmail,
+} from '../../utils/mailer';
 
 import { authRepository } from './auth.repository';
 
@@ -141,6 +144,56 @@ export const authService = {
     } = user;
 
     return { accessToken, refreshToken, userData };
+  },
+
+  async forgotPassword(email: string) {
+    const user = await userRepository.findByEmail(email);
+    if (!user) {
+      throw new NotFoundError('User does not exist');
+    }
+
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto
+      .createHash('sha256')
+      .update(rawToken)
+      .digest('hex');
+
+    await authRepository.createToken({
+      userId: user.id,
+      hashedToken,
+      tokenType: 'password_reset',
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    });
+
+    await sendPasswordResetEmail(user.email, rawToken);
+  },
+
+  async resetPassword(rawToken: string, newPassword: string) {
+    const hashedToken = crypto
+      .createHash('sha256')
+      .update(rawToken)
+      .digest('hex');
+
+    const token = await authRepository.findByTokenAndType({
+      hashedToken,
+      tokenType: 'password_reset',
+    });
+
+    if (!token) {
+      throw new NotFoundError('Token does not exist');
+    }
+
+    if (!token.expiresAt || token.expiresAt < new Date()) {
+      throw new InvalidCredentialError('Token has expired');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await db.transaction(async (tx) => {
+      await userRepository.updatePasswordById(tx, token.userId, hashedPassword);
+
+      await authRepository.deleteTokenById(tx, token.id);
+    });
   },
 
   /**
