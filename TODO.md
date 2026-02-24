@@ -20,8 +20,8 @@
 ## Users module
 
 - [✅] Users review history(done)
-- [ ] Delete Account
-- [ ] Password reset & Email varification (only if i decied to stick with this simple JWT based AUTH, if i plan to move on for OAuth 2.0 then this features does not matter)
+- [✅] Delete Account
+- [✅] Password reset & Email varification 
 
 ## Resource Module
 

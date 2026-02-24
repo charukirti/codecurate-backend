@@ -1,8 +1,17 @@
 import { Router } from 'express';
 import { verifyToken } from '../auth/auth.middleware';
-import { getProfile, getUserReviews, updateProfile } from './users.controller';
+import {
+  deleteUser,
+  getProfile,
+  getUserReviews,
+  updateProfile,
+} from './users.controller';
 import { validate } from '../../middlewares/validate';
-import { updateUser, usersReviewsParamSchema } from './users.schema';
+import {
+  deleteUserSchema,
+  updateUser,
+  usersReviewsParamSchema,
+} from './users.schema';
 
 const router = Router();
 
@@ -14,6 +23,12 @@ router.get(
     params: usersReviewsParamSchema,
   }),
   getUserReviews
+);
+router.delete(
+  '/me',
+  verifyToken,
+  validate({ body: deleteUserSchema }),
+  deleteUser
 );
 
 export default router;

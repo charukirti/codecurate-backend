@@ -1,9 +1,14 @@
 import { UserData } from '../../db/schema';
-import { ConflictError, NotFoundError } from '../../shared/errors';
+import {
+  ConflictError,
+  NotFoundError,
+  ValidationError,
+} from '../../shared/errors';
 import { UpdateUserInput } from './users.schema';
 import { SortType } from '../../shared/schema';
 import { userRepository } from './user.repository';
 import { reviewsRepository } from '../reviews/repositories/reviews.repository';
+import bcrypt from 'bcryptjs';
 
 export const userService = {
   /**
@@ -103,5 +108,21 @@ export const userService = {
         totalPages,
       },
     };
+  },
+
+  async deleteUser(userId: string, password: string): Promise<void> {
+    const user = await userRepository.findById(userId);
+
+    if (!user) {
+      throw new NotFoundError('User does not exist');
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      throw new ValidationError('Password does not match');
+    }
+
+    await userRepository.deleteUserById(user.id);
   },
 };

@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { userService } from './users.service';
 import {
+  DeleteUserInput,
   getUserReviewsQuerySchema,
   UpdateUserInput,
   UsersReviewsParam,
 } from './users.schema';
-import { UnauthorizedError } from '../../shared/errors';
+import { UnauthorizedError, ValidationError } from '../../shared/errors';
 
 export async function getProfile(
   req: Request,
@@ -78,6 +79,34 @@ export async function getUserReviews(
         pagination,
       },
     });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function deleteUser(
+  req: Request<{}, {}, DeleteUserInput>,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { password, confirmDeletion } = req.body;
+
+    const userId = req.userId;
+
+    if (!userId) {
+      throw new UnauthorizedError('User not authenticated');
+    }
+
+    if (!confirmDeletion) {
+      throw new ValidationError('You must confirm account deletion');
+    }
+
+    await userService.deleteUser(userId, password);
+
+    res.clearCookie('refreshToken');
+
+    res.status(200).json({ message: 'Account deleted successfully' });
   } catch (error) {
     next(error);
   }

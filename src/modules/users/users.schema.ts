@@ -33,6 +33,14 @@ export const getUserReviewsQuerySchema = z.object({
   sort: sort.optional().default('newest'),
 });
 
+export const deleteUserSchema = z.object({
+  password: z.string().min(1, 'password is required'),
+  confirmDeletion: z.boolean().refine((val) => val === true, {
+    error: 'You must confirm account deletion',
+  }),
+});
+
 export type UpdateUserInput = z.infer<typeof updateUser>;
 export type UsersReviewsParam = z.infer<typeof usersReviewsParamSchema>;
 export type GetUserReviewsQuery = z.infer<typeof getUserReviewsQuerySchema>;
+export type DeleteUserInput = z.infer<typeof deleteUserSchema>;

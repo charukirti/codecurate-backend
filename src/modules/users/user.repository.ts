@@ -95,4 +95,8 @@ export const userRepository = {
       .set({ password: hashedPassword })
       .where(eq(users.id, userId));
   },
+
+  async deleteUserById(id: string): Promise<void> {
+    await db.delete(users).where(eq(users.id, id));
+  },
 };
