@@ -7,6 +7,9 @@ import resourceRoutes from './modules/resource/resource.routes.js';
 import { tagsRouter } from './modules/reviews/reviews.routes.js';
 import { ErrorHandler, notFoundHandler } from './middlewares/errorHandler.js';
 import appConfig from './config/app.config.js';
+import swaggerUi from 'swagger-ui-express';
+
+import swaggerDoc from './swagger.json';
 
 const app = express();
 
@@ -47,6 +50,7 @@ app.get('/health', (req, res) => {
   });
 });
 
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/resources', resourceRoutes);

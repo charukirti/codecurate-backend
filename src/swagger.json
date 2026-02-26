@@ -1,0 +1,2213 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "codeCurate",
+    "version": "1.0.0",
+    "description": "# codeCurate API\n\ncodeCurate is a community-driven curation platform where users can discover, share, and review helpful YouTube videos and playlists. Think of it as a curated library of educational content where the community can write reviews, like helpful reviews, and engage in discussions through threaded replies.\n\n## What You Can Do\n\n**Authentication** – Sign up, sign in, sign out, verify your email, reset your password, and refresh your access token.\n\n**User Profiles** – View, update, or delete your own profile.\n\n**Resources** – Browse all YouTube videos and playlists, view individual resources, and find related content. Note: Only admins can add or remove resources. Regular users can browse and review them.\n\n**Reviews** – Write reviews on resources, edit or delete your own reviews, like reviews from others, and participate in threaded reply conversations.\n\n## Base URL\n\nAll API endpoints use: `localhost:8000/api/v1`\n\nThere's also a health check endpoint at `localhost:8000/health` to verify the server is running.\n\n## Getting Started\n\n1. Use the **signup** request to create a new account\n    \n2. Verify your email using the link sent to you\n    \n3. **Sign in** to get your access token\n    \n4. Start exploring YouTube videos and playlists, and share your reviews!"
+  },
+  "servers": [
+    {
+      "url": "localhost:8000"
+    },
+    {
+      "url": "http://localhost:8000"
+    }
+  ],
+  "paths": {
+    "/api/v1/auth/signin": {
+      "post": {
+        "summary": "signin(admin)",
+        "responses": {
+          "200": {
+            "description": "signin(admin)",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkOTE3ODRhOS1kOTFhLTRkMDMtYTMwOS03ODYyMWE0MTgzOTgiLCJpYXQiOjE3NzIwOTIyOTIsImV4cCI6MTc3MjY5NzA5Mn0.RjwYcZ0OARZcBLBZ-PiMd7xj2Vn81pC-23LXJW8zsCU; Max-Age=604800; Path=/; Expires=Thu, 05 Mar 2026 07:51:32 GMT; HttpOnly; SameSite=Strict"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "517"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"205-xg4O+gly3nwxqYOrAmaPBFXcfC0\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 07:51:32 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["authentication"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "email": "charukirticc2609@gmail.com",
+                "password": "jstAormalcoder201102"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/signup": {
+      "post": {
+        "summary": "signup (user)",
+        "responses": {
+          "201": {
+            "description": "signup (user)",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "306"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"132-s+Whlhc9WPAjH0PB8tn37ccKf1w\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 07:40:41 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["authentication"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "username": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "name": "charukirti",
+                "username": "charukirti",
+                "email": "charukirticc112002@gmail.com",
+                "password": "justFortest1"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/verify-email": {
+      "get": {
+        "summary": "verify-email",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "required": false,
+            "deprecated": false,
+            "schema": {},
+            "example": "8ac0db5545a29f59e5a060e0f668b19facb30bc2934136192ec20b0cf7657aea"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "verify-email",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "41"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"29-FwmB7f+DMIStv83qlAh+ZHaWnfU\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 07:41:44 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["authentication"]
+      }
+    },
+    "/api/v1/auth/signout": {
+      "post": {
+        "summary": "sign out",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyYmJjOTlkZC1mM2IwLTRhZTctYjZhMC04YTY2OGQyMmQ4NzciLCJyb2xlIjoidXNlciIsImlhdCI6MTc3MjA5MjYyMywiZXhwIjoxNzcyMDkzNTIzfQ.YgYKfjlIzVpeva6OdEqGx-EDUKkD4h4Q6tm4XhORypI"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "sign out",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "refreshToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "42"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"2a-Zr+GbzD5Z+a5UsoN6TkbgLVWVuA\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 07:57:26 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["authentication"]
+      }
+    },
+    "/api/v1/auth/refresh-token": {
+      "post": {
+        "summary": "refresh token",
+        "responses": {
+          "200": {
+            "description": "refresh token",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4MzIyZTAyMS03YTNiLTQ1ZDYtOTc5Mi0xNzE5MDkyYTM0YWEiLCJpYXQiOjE3NzIwOTEzOTUsImV4cCI6MTc3MjY5NjE5NX0.HPIKkALK4E0ahFqCb2bryAsGG7lcQGbMStB8wek6iwA; Max-Age=604800; Path=/; Expires=Thu, 05 Mar 2026 07:36:35 GMT; HttpOnly; SameSite=Strict"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "269"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"10d-8LFy4DxA51gk9s3rfqsFUmIlLfw\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 07:36:35 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["authentication"]
+      }
+    },
+    "/api/v1/auth/forgot-password": {
+      "post": {
+        "summary": "forgot-password",
+        "responses": {
+          "200": {
+            "description": "forgot-password",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "52"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"34-DtsQuOuVSa6wb+lIBvf7kbfENus\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 07:55:19 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["authentication"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                }
+              },
+              "example": {
+                "email": "charukirticc112002@gmail.com"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/reset-password": {
+      "post": {
+        "summary": "reset-password",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "required": false,
+            "deprecated": false,
+            "schema": {},
+            "example": "20f136e4aaf6ed5314c099001ff0a9024a590be7cb840b7aaee655c5ad1bfb7c"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "reset-password",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "43"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"2b-9xcF3jotYikg+51ytwjSZnGu9aE\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 07:56:07 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["authentication"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "newPassword": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "newPassword": "newPassword123"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/users/me": {
+      "get": {
+        "summary": "get user",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4MzIyZTAyMS03YTNiLTQ1ZDYtOTc5Mi0xNzE5MDkyYTM0YWEiLCJyb2xlIjoidXNlciIsImlhdCI6MTc3MjA5MTMyNSwiZXhwIjoxNzcyMDkyMjI1fQ.zs6NvQzhmwMciX-4nF__sRra0x-CPZ5GKgrnOPIq9_s"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "get user",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "294"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"126-Y+lehPFyKXpRl2gQa40QFYfWN2E\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 07:36:11 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["users"]
+      },
+      "patch": {
+        "summary": "update user",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyYmJjOTlkZC1mM2IwLTRhZTctYjZhMC04YTY2OGQyMmQ4NzciLCJyb2xlIjoidXNlciIsImlhdCI6MTc3MjA5MjYyMywiZXhwIjoxNzcyMDkzNTIzfQ.YgYKfjlIzVpeva6OdEqGx-EDUKkD4h4Q6tm4XhORypI"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "update user",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "288"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"120-wSQhlItr9gxwzxwIIdpatxw9t0k\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 07:58:46 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["users"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "username": "charukirti@11"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "delete user",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4MzIyZTAyMS03YTNiLTQ1ZDYtOTc5Mi0xNzE5MDkyYTM0YWEiLCJyb2xlIjoidXNlciIsImlhdCI6MTc3MjA5MTM5NSwiZXhwIjoxNzcyMDkyMjk1fQ.RupBJs1vkQUw6OOVLL0s9tNTEVw1ieB90KgkKys-qpk"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "delete user",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "refreshToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "42"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"2a-34WA/E85hFWaktkanlfSv4XDTGM\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 07:40:10 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["users"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string"
+                  },
+                  "confirmDeletion": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "example": {
+                "password": "newPassword123",
+                "confirmDeletion": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/resources": {
+      "get": {
+        "summary": "get all resources",
+        "responses": {
+          "200": {
+            "description": "get all resources",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "23129"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"5a59-fFcq68+Go15pSNMniVhoXvdoyRk\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 07:34:46 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["resources"]
+      },
+      "post": {
+        "summary": "add new resource",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkOTE3ODRhOS1kOTFhLTRkMDMtYTMwOS03ODYyMWE0MTgzOTgiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NzIwOTMyNjYsImV4cCI6MTc3MjA5NDE2Nn0.DFD13h6kxzAmSEkaIob8Jf9b_vOzcHwuZEdyhPunBcI"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "add new resource",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "3738"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"e9a-ocfHpEE/nOH4Iaf6CNIJ4z1yBfU\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 08:08:06 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["resources"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "codeLang": {
+                    "type": "string"
+                  },
+                  "videoLang": {
+                    "type": "string"
+                  },
+                  "resourceType": {
+                    "type": "string"
+                  },
+                  "topic": {
+                    "type": "string"
+                  },
+                  "instructorName": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "url": "https://youtu.be/7BTsepZ9xp8?si=F88qCx0GRuTfnE4t",
+                "codeLang": "Node.js",
+                "videoLang": "English",
+                "resourceType": "video",
+                "topic": "Authentication",
+                "instructorName": "Great Stack"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/resources/{resourceId}": {
+      "get": {
+        "summary": "get resource",
+        "responses": {
+          "200": {
+            "description": "get resource",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "3760"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"eb0-EjLEWxvrWHguq2KtrUfoMcbM5QA\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 09:22:22 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["resources"]
+      },
+      "parameters": [
+        {
+          "name": "resourceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "c55cd578-1d09-4396-8c52-6980fe4f7e79"
+        }
+      ],
+      "delete": {
+        "summary": "delete resource",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkOTE3ODRhOS1kOTFhLTRkMDMtYTMwOS03ODYyMWE0MTgzOTgiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NzIwOTc5NDksImV4cCI6MTc3MjA5ODg0OX0.QPPA841Ja66Crk9vcmUMbbYJIxhz-Jx6yC6x9UeSaL4"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "delete resource",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "43"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"2b-hN8Tx3wBmCQxemxJsT22J18XfIQ\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 09:26:10 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["resources"]
+      }
+    },
+    "/api/v1/resources/{resourceId}/related": {
+      "get": {
+        "summary": "get related resources",
+        "responses": {
+          "200": {
+            "description": "get related resources",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "11462"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"2cc6-1iTQRC1O4u3hErHOvsWVk4ncWjc\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 09:23:02 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["resources"]
+      },
+      "parameters": [
+        {
+          "name": "resourceId",
+          "in": "path",
+          "required": true,
+          "deprecated": false,
+          "schema": {},
+          "example": "c1058c74-fd2d-4a29-88cd-9c6bf413437a"
+        }
+      ]
+    },
+    "/api/v1/resources/c6e09925-0678-4b0d-804e-992f14df8aae/reviews": {
+      "get": {
+        "summary": "get all reviews",
+        "responses": {
+          "200": {
+            "description": "get all reviews",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "1839"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"72f-BQnbhr9YWg14T7Y7m9VSfRb5D3Y\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 08:11:32 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["reviews"]
+      }
+    },
+    "/api/v1/reviews/tags": {
+      "get": {
+        "summary": "get all review tags",
+        "responses": {
+          "200": {
+            "description": "get all review tags",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "1384"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"568-i4ErwIgc+hC4CsBx4/Yp7qVlqCg\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 08:11:51 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["reviews"]
+      }
+    },
+    "/api/v1/resources/{resourceId}/reviews": {
+      "post": {
+        "summary": "write a review",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyYmJjOTlkZC1mM2IwLTRhZTctYjZhMC04YTY2OGQyMmQ4NzciLCJyb2xlIjoidXNlciIsImlhdCI6MTc3MjA5ODMzOSwiZXhwIjoxNzcyMDk5MjM5fQ.DmP1T7pBGT0Bpq0Z3k2gBholyCEojTR6Et7ioviWH7I"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "write a review",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "1019"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"3fb-jxod5ADaX8QyNmK1XvHKzFbP7Z8\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 08:57:57 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["reviews"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reviewText": {
+                    "type": "string"
+                  },
+                  "rating": {
+                    "type": "integer"
+                  },
+                  "tagIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "reviewText": "I found this YouTube tutorial extremely helpful. The presenter breaks down complex concepts into clear, easy-to-follow steps and uses real-world examples that make the material practical and relatable.",
+                "rating": 7,
+                "tagIds": [
+                  "29c965a8-31d3-471a-bd38-40ac23b7a38b",
+                  "ee2c0c38-7ce5-4563-b8d4-c2e8f16108dc",
+                  "bba06556-026a-43b7-9be2-69b5a7784b76"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "resourceId",
+          "in": "path",
+          "required": true,
+          "deprecated": false,
+          "schema": {},
+          "example": "c1058c74-fd2d-4a29-88cd-9c6bf413437a"
+        }
+      ]
+    },
+    "/api/v1/resources/{resourceId}/reviews/{reviewId}": {
+      "patch": {
+        "summary": "update review",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyYmJjOTlkZC1mM2IwLTRhZTctYjZhMC04YTY2OGQyMmQ4NzciLCJyb2xlIjoidXNlciIsImlhdCI6MTc3MjA5ODMzOSwiZXhwIjoxNzcyMDk5MjM5fQ.DmP1T7pBGT0Bpq0Z3k2gBholyCEojTR6Et7ioviWH7I"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "update review",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "863"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"35f-0y1/nbsWMC0J2jhkIPrQOdrefzw\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 09:34:11 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["reviews"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "rating": {
+                    "type": "integer"
+                  },
+                  "reviewText": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "rating": 5,
+                "reviewText": "This is was not that much good tutorial"
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "resourceId",
+          "in": "path",
+          "required": true,
+          "deprecated": false,
+          "schema": {},
+          "example": "c6e09925-0678-4b0d-804e-992f14df8aae"
+        },
+        {
+          "name": "reviewId",
+          "in": "path",
+          "required": true,
+          "deprecated": false,
+          "schema": {},
+          "example": "232c04cd-6e09-4acc-9527-775c3f38444d"
+        }
+      ],
+      "delete": {
+        "summary": "delete review",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyYmJjOTlkZC1mM2IwLTRhZTctYjZhMC04YTY2OGQyMmQ4NzciLCJyb2xlIjoidXNlciIsImlhdCI6MTc3MjA5NjUzNywiZXhwIjoxNzcyMDk3NDM3fQ.wh0nFkzvV3Vvs4yXWA_SK-WmkZEJFY1vk8i1CE9MFL0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "delete review",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "41"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"29-eJZH9QbGPKzQCQgLPX3JFUdcheo\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 09:02:43 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["reviews"]
+      }
+    },
+    "/api/v1/resources/{resourceId}/reviews/{reviewId}/like": {
+      "post": {
+        "summary": "like a review",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyYmJjOTlkZC1mM2IwLTRhZTctYjZhMC04YTY2OGQyMmQ4NzciLCJyb2xlIjoidXNlciIsImlhdCI6MTc3MjA5NDIxOCwiZXhwIjoxNzcyMDk1MTE4fQ.fntqWHnwd_KGuje-fpak-LJIFgXEiSjcIOII8xWRp4g"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "like a review",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "39"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"27-+Eu8Xjfx/llDNj522jJnJ/MuCMY\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 08:29:41 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["reviews"]
+      },
+      "parameters": [
+        {
+          "name": "resourceId",
+          "in": "path",
+          "required": true,
+          "deprecated": false,
+          "schema": {},
+          "example": "c6e09925-0678-4b0d-804e-992f14df8aae"
+        },
+        {
+          "name": "reviewId",
+          "in": "path",
+          "required": true,
+          "deprecated": false,
+          "schema": {},
+          "example": "e169e875-2970-4b8a-b993-19f66791e726"
+        }
+      ]
+    },
+    "/api/v1/resources/{resourceId}/reviews/{reviewId}/unlike": {
+      "delete": {
+        "summary": "unlike  review",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyYmJjOTlkZC1mM2IwLTRhZTctYjZhMC04YTY2OGQyMmQ4NzciLCJyb2xlIjoidXNlciIsImlhdCI6MTc3MjA5ODMzOSwiZXhwIjoxNzcyMDk5MjM5fQ.DmP1T7pBGT0Bpq0Z3k2gBholyCEojTR6Et7ioviWH7I"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "unlike  review",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "41"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"29-PofDua3ECpo0ZNbudRRlVXiwRgs\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 08:55:37 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["reviews"]
+      },
+      "parameters": [
+        {
+          "name": "resourceId",
+          "in": "path",
+          "required": true,
+          "deprecated": false,
+          "schema": {},
+          "example": "c1058c74-fd2d-4a29-88cd-9c6bf413437a"
+        },
+        {
+          "name": "reviewId",
+          "in": "path",
+          "required": true,
+          "deprecated": false,
+          "schema": {},
+          "example": "f7043c63-d3ee-41ab-93be-f085ea69e3bd"
+        }
+      ]
+    },
+    "/api/v1/resources/{resourceId}/reviews/{reviewId}/replies": {
+      "post": {
+        "summary": "reply to review",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkOTE3ODRhOS1kOTFhLTRkMDMtYTMwOS03ODYyMWE0MTgzOTgiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NzIwOTcyNjQsImV4cCI6MTc3MjA5ODE2NH0.P6KpeAf4w1MiwPxE9ielKUZS0z-KRALsmxSKCy-_xiw"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "reply to review",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "248"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"f8-OQsjGTRB/Ev48PnFJySPt7dQe84\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 09:12:58 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["reviews"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "replyText": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "replyText": "thanks for your review for this video, it really helped me to learn Next js."
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "resourceId",
+          "in": "path",
+          "required": true,
+          "deprecated": false,
+          "schema": {},
+          "example": "c6e09925-0678-4b0d-804e-992f14df8aae"
+        },
+        {
+          "name": "reviewId",
+          "in": "path",
+          "required": true,
+          "deprecated": false,
+          "schema": {},
+          "example": "b312b72d-960b-4b19-a068-394c6b16ea06"
+        }
+      ],
+      "get": {
+        "summary": "get all replies",
+        "responses": {
+          "200": {
+            "description": "get all replies",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "423"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"1a7-giMqVTJr3puWwUV1zdKiFDzbrwc\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 09:20:08 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["reviews"]
+      }
+    },
+    "/api/v1/resources/{resourceId}/reviews/{reviewId}/replies/{replyId}": {
+      "patch": {
+        "summary": "update review reply",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkOTE3ODRhOS1kOTFhLTRkMDMtYTMwOS03ODYyMWE0MTgzOTgiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NzIwOTcyNjQsImV4cCI6MTc3MjA5ODE2NH0.P6KpeAf4w1MiwPxE9ielKUZS0z-KRALsmxSKCy-_xiw"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "update review reply",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "331"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"14b-Su/PVh6KYZUCGz//Jvm585sEKb4\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 09:17:06 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["reviews"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "replyText": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "replyText": "I disagree with this review. It's not accurate."
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "resourceId",
+          "in": "path",
+          "required": true,
+          "deprecated": false,
+          "schema": {},
+          "example": "c6e09925-0678-4b0d-804e-992f14df8aae"
+        },
+        {
+          "name": "reviewId",
+          "in": "path",
+          "required": true,
+          "deprecated": false,
+          "schema": {},
+          "example": "e169e875-2970-4b8a-b993-19f66791e726"
+        },
+        {
+          "name": "replyId",
+          "in": "path",
+          "required": true,
+          "deprecated": false,
+          "schema": {},
+          "example": "b4759894-a0ce-420d-85af-4ce6cdcdbf27"
+        }
+      ],
+      "delete": {
+        "summary": "delete review reply",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkOTE3ODRhOS1kOTFhLTRkMDMtYTMwOS03ODYyMWE0MTgzOTgiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NzIwOTcyNjQsImV4cCI6MTc3MjA5ODE2NH0.P6KpeAf4w1MiwPxE9ielKUZS0z-KRALsmxSKCy-_xiw"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "delete review reply",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "40"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"28-1H6BW4rva4c5OLkG5sEsx0f+FjI\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 09:18:56 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        },
+        "tags": ["reviews"]
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "health check",
+        "responses": {
+          "200": {
+            "description": "health check",
+            "headers": {
+              "X-Powered-By": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Express"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Origin"
+              },
+              "Access-Control-Allow-Credentials": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": "true"
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer"
+                },
+                "example": "102"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"66-DJrgNs83uitRnHiezJUseadwG54\""
+              },
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Thu, 26 Feb 2026 09:27:20 GMT"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "Keep-Alive": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "timeout=5"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

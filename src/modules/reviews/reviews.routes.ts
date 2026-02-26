@@ -66,7 +66,7 @@ router.post(
 );
 
 router.delete(
-  '/:reviewId/like',
+  '/:reviewId/unlike',
   verifyToken,
   validate({ params: reviewIdParamSchema }),
   unlikeReview

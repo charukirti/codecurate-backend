@@ -44,6 +44,7 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^8.0.1",
+    "swagger-ui-express": "^5.0.1",
     "winston": "^3.19.0",
     "zod": "^4.1.13"
   },
@@ -56,6 +57,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.10.0",
     "@types/nodemailer": "^7.0.11",
+    "@types/swagger-ui-express": "^4.1.8",
     "drizzle-kit": "^0.31.6",
     "eslint": "^9.39.1",
     "globals": "^16.5.0",
