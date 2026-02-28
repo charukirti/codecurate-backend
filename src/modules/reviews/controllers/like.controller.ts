@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { ReviewIdParams } from '../reviews.schema';
-import { UnauthorizedError } from '../../../shared/errors';
-import { reviewLikeService } from '../services/like.service';
+import { ReviewIdParams } from '../reviews.schema.js';
+import { UnauthorizedError } from '../../../shared/errors.js';
+import { reviewLikeService } from '../services/like.service.js';
 
 export async function likeReview(
   req: Request<ReviewIdParams, {}, {}>,

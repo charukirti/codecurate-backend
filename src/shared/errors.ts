@@ -4,7 +4,7 @@
  * - Each error has proper HTTP status code
  */
 
-import appConfig from '../config/app.config';
+import appConfig from '../config/app.config.js';
 
 export class AppError extends Error {
   public statusCode: number; // HTTP stauts code

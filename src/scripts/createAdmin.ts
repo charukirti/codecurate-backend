@@ -1,8 +1,8 @@
 import { eq } from 'drizzle-orm';
-import { db } from '../db';
-import { users } from '../db/schema';
-import { InternalError, InvalidCredentialError } from '../shared/errors';
-import Logger from '../utils/logger';
+import { db } from '../db/index.js';
+import { users } from '../db/schema/users.js';
+import { InternalError, InvalidCredentialError } from '../shared/errors.js';
+import Logger from '../utils/logger.js';
 
 async function createAdmin() {
   try {

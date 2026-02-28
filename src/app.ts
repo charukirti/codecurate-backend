@@ -8,7 +8,7 @@ import { tagsRouter } from './modules/reviews/reviews.routes.js';
 import { ErrorHandler, notFoundHandler } from './middlewares/errorHandler.js';
 import appConfig from './config/app.config.js';
 import swaggerUi from 'swagger-ui-express';
-import swaggerDoc from './swagger.json';
+import swaggerDoc from './swagger.json' with { type: 'json' };
 import { globalRateLimiter } from './middlewares/rateLimiter.js';
 import helmet from 'helmet';
 

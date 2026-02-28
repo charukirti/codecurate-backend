@@ -5,16 +5,16 @@ import {
   getAllReviews,
   getAllTags,
   updateReview,
-} from './controllers/reviews.controller';
-import { likeReview, unlikeReview } from './controllers/like.controller';
+} from './controllers/reviews.controller.js';
+import { likeReview, unlikeReview } from './controllers/like.controller.js';
 import {
   addReply,
   deleteReply,
   getAllReplies,
   updateReply,
-} from './controllers/reply.controller';
+} from './controllers/reply.controller.js';
 
-import { validate } from '../../middlewares/validate';
+import { validate } from '../../middlewares/validate.js';
 
 import {
   addReplySchema,
@@ -24,9 +24,9 @@ import {
   reviewAndResourceParamsSchema,
   reviewIdParamSchema,
   updateReviewSchema,
-} from './reviews.schema';
+} from './reviews.schema.js';
 
-import { verifyToken } from '../auth/auth.middleware';
+import { verifyToken } from '../auth/auth.middleware.js';
 
 const router = Router({ mergeParams: true });
 const tagsRouter = Router();

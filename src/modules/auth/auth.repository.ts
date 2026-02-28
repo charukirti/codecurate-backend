@@ -1,7 +1,7 @@
 import { and, eq } from 'drizzle-orm';
-import { db } from '../../db';
-import { verificationTokens } from '../../db/schema/verificationTokens';
-import { Transaction } from '../reviews/reviews.types';
+import { db } from '../../db/index.js';
+import { verificationTokens } from '../../db/schema/verificationTokens.js';
+import { Transaction } from '../reviews/reviews.types.js';
 
 export const authRepository = {
   async createToken(data: {

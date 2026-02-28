@@ -3,9 +3,9 @@ import {
   createResourceInput,
   getResourceByIdParam,
   getResourcesQuerySchema,
-} from './resource.schema';
-import { resourceService } from './resource.service';
-import { ValidationError } from '../../shared/errors';
+} from './resource.schema.js';
+import { resourceService } from './resource.service.js';
+import { ValidationError } from '../../shared/errors.js';
 
 export async function createResource(
   req: Request<{}, {}, createResourceInput>,

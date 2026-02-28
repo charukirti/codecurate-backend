@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
-import { reviewService } from '../services/reviews.service';
+import { reviewService } from '../services/reviews.service.js';
 import {
   CreateReviewInput,
   getReviewsQuerySchema,
   ResourceIdParams,
   ReviewAndResourceParams,
   UpdateReviewInput,
-} from '../reviews.schema';
-import { UnauthorizedError } from '../../../shared/errors';
+} from '../reviews.schema.js';
+import { UnauthorizedError } from '../../../shared/errors.js';
 
 export async function getAllTags(
   req: Request,

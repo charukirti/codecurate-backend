@@ -1,19 +1,19 @@
 import { Router } from 'express';
-import { validate } from '../../middlewares/validate';
-import reviewRoutes from '../reviews/reviews.routes';
+import { validate } from '../../middlewares/validate.js';
+import reviewRoutes from '../reviews/reviews.routes.js';
 
 import {
   createResourceSchema,
   getResourceParamSchema,
-} from './resource.schema';
+} from './resource.schema.js';
 import {
   createResource,
   deleteResource,
   getAllResources,
   getRelatedResources,
   getResource,
-} from './resource.controller';
-import { requireAdmin, verifyToken } from '../auth/auth.middleware';
+} from './resource.controller.js';
+import { requireAdmin, verifyToken } from '../auth/auth.middleware.js';
 
 const router = Router();
 

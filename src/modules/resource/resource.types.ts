@@ -1,4 +1,4 @@
-import { Resource } from '../../db/schema';
+import { Resource } from '../../db/schema/resources.js';
 
 export type StatsData = {
   viewCount: number;

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { ForbiddenError, UnauthorizedError } from '../../shared/errors';
+import { ForbiddenError, UnauthorizedError } from '../../shared/errors.js';
 import jwt from 'jsonwebtoken';
-import authConfig from '../../config/auth.config';
+import authConfig from '../../config/auth.config.js';
 
 /**
  * Middleware to validate JWT token for authenticated users

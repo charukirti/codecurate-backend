@@ -1,7 +1,7 @@
-import { db } from '../../../db';
-import { ConflictError, NotFoundError } from '../../../shared/errors';
-import { reviewsRepository } from '../repositories/reviews.repository';
-import { reviewLikeRepository } from '../repositories/reviewLike.repository';
+import { db } from '../../../db/index.js';
+import { ConflictError, NotFoundError } from '../../../shared/errors.js';
+import { reviewsRepository } from '../repositories/reviews.repository.js';
+import { reviewLikeRepository } from '../repositories/reviewLike.repository.js';
 
 export const reviewLikeService = {
   /**

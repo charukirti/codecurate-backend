@@ -5,10 +5,10 @@ import {
   SignInInput,
   SignUpInput,
   verifyEmailQuerySchema,
-} from './auth.schema';
-import { authService } from './auth.service';
-import appConfig from '../../config/app.config';
-import { UnauthorizedError } from '../../shared/errors';
+} from './auth.schema.js';
+import { authService } from './auth.service.js';
+import appConfig from '../../config/app.config.js';
+import { UnauthorizedError } from '../../shared/errors.js';
 
 export async function signUp(
   req: Request<{}, {}, SignUpInput>,

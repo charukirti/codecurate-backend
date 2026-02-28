@@ -1,5 +1,5 @@
 import z from 'zod';
-import { sort } from '../../shared/schema';
+import { sort } from '../../shared/schema.js';
 
 /* ---------- Schema for request body ------------ */
 

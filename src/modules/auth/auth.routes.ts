@@ -7,16 +7,16 @@ import {
   signOut,
   signUp,
   verifyEmail,
-} from './auth.controller';
-import { validate } from '../../middlewares/validate';
+} from './auth.controller.js';
+import { validate } from '../../middlewares/validate.js';
 import {
   forgotPasswordSchema,
   resetPasswordSchema,
   signInSchema,
   signUpSchema,
-} from './auth.schema';
-import { verifyToken } from './auth.middleware';
-import { authRateLimiter } from '../../middlewares/rateLimiter';
+} from './auth.schema.js';
+import { verifyToken } from './auth.middleware.js';
+import { authRateLimiter } from '../../middlewares/rateLimiter.js';
 
 const router = Router();
 

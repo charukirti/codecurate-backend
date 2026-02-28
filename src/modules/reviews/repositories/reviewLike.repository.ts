@@ -1,7 +1,7 @@
 import { and, eq } from 'drizzle-orm';
-import { db } from '../../../db';
-import { ReviewLike, reviewLikes } from '../../../db/schema';
-import { Transaction } from '../reviews.types';
+import { db } from '../../../db/index.js';
+import { ReviewLike, reviewLikes } from '../../../db/schema/reviewLikes.js';
+import { Transaction } from '../reviews.types.js';
 
 export const reviewLikeRepository = {
   async findByReviewAndUser(reviewId: string, userId: string) {

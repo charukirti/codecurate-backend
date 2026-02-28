@@ -1,6 +1,6 @@
 import z from 'zod';
 import type { Request, Response, NextFunction } from 'express';
-import { ValidationError } from '../shared/errors';
+import { ValidationError } from '../shared/errors.js';
 
 /**
  * Middleware to validate request with zod scheams

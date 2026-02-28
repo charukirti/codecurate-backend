@@ -1,13 +1,13 @@
-import { UserData } from '../../db/schema';
+import { UserData } from '../../db/schema/users.js';
 import {
   ConflictError,
   NotFoundError,
   ValidationError,
-} from '../../shared/errors';
-import { UpdateUserInput } from './users.schema';
-import { SortType } from '../../shared/schema';
-import { userRepository } from './user.repository';
-import { reviewsRepository } from '../reviews/repositories/reviews.repository';
+} from '../../shared/errors.js';
+import { UpdateUserInput } from './users.schema.js';
+import { SortType } from '../../shared/schema.js';
+import { userRepository } from './user.repository.js';
+import { reviewsRepository } from '../reviews/repositories/reviews.repository.js';
 import bcrypt from 'bcryptjs';
 
 export const userService = {

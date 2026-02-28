@@ -1,6 +1,6 @@
 import { inArray } from 'drizzle-orm';
-import { db } from '../../../db';
-import { Tags, tags } from '../../../db/schema';
+import { db } from '../../../db/index.js';
+import { Tags, tags } from '../../../db/schema/tags.js';
 
 export const tagsRepository = {
   async findAll(): Promise<Tags[]> {

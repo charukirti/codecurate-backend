@@ -1,17 +1,17 @@
 import { Router } from 'express';
-import { verifyToken } from '../auth/auth.middleware';
+import { verifyToken } from '../auth/auth.middleware.js';
 import {
   deleteUser,
   getProfile,
   getUserReviews,
   updateProfile,
-} from './users.controller';
-import { validate } from '../../middlewares/validate';
+} from './users.controller.js';
+import { validate } from '../../middlewares/validate.js';
 import {
   deleteUserSchema,
   updateUser,
   usersReviewsParamSchema,
-} from './users.schema';
+} from './users.schema.js';
 
 const router = Router();
 

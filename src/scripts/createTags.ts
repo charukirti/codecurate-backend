@@ -1,5 +1,5 @@
-import { db } from '../db';
-import { tags } from '../db/schema';
+import { db } from '../db/index.js';
+import { tags } from '../db/schema/tags.js';
 
 const tagsArray = [
   { name: 'beginner-friendly', displayName: 'Beginner Friendly' },

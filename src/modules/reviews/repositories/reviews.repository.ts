@@ -1,12 +1,12 @@
 import { and, asc, desc, eq, sql, count } from 'drizzle-orm';
-import { db } from '../../../db';
-import { Reviews, reviews } from '../../../db/schema';
+import { db } from '../../../db/index.js';
+import { Reviews, reviews } from '../../../db/schema/review.js';
 import {
   createReviewData,
   ReviewWithRelations,
   Transaction,
-} from '../reviews.types';
-import { SortType } from '../../../shared/schema';
+} from '../reviews.types.js';
+import { SortType } from '../../../shared/schema.js';
 
 export const reviewsRepository = {
   async create(

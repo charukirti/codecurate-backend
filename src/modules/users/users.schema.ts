@@ -1,7 +1,7 @@
 /** Schema for update user */
 
 import z from 'zod';
-import { sort } from '../../shared/schema';
+import { sort } from '../../shared/schema.js';
 
 export const updateUser = z
   .object({

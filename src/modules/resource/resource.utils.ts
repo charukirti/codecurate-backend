@@ -2,7 +2,7 @@
  * cache map that stores youtube videos like count and view count for 24 hrs.
  */
 
-import { CachedStats, StatsData } from './resource.types';
+import { CachedStats, StatsData } from './resource.types.js';
 
 const CACHE_TTL = 24 * 60 * 60 * 1000;
 

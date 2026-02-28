@@ -1,5 +1,5 @@
 import { pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
-import { users } from './users';
+import { users } from './users.js';
 
 export const tokenTypesEnum = pgEnum('token_type', [
   'email_verification',

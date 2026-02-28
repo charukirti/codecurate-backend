@@ -1,19 +1,19 @@
-import { NewResource, Resource } from '../../db/schema';
+import { NewResource, Resource } from '../../db/schema/index.js';
 import {
   ConflictError,
   InternalError,
   NotFoundError,
   ValidationError,
-} from '../../shared/errors';
+} from '../../shared/errors.js';
 import {
   PlaylistAPIResponse,
   VideoAPIResponse,
-} from '../../types/youtube-api-response';
-import { ResourceWithStats, StatsData } from './resource.types';
-import { statsCache } from './resource.utils';
-import { youtubeApiService } from './youtubeapi.service';
-import { resourceRepository } from './resource.repository';
-import { extractVideoUrl } from '../../utils/extractVideoUrl';
+} from '../../types/youtube-api-response.js';
+import { ResourceWithStats, StatsData } from './resource.types.js';
+import { statsCache } from './resource.utils.js';
+import { youtubeApiService } from './youtubeapi.service.js';
+import { resourceRepository } from './resource.repository.js';
+import { extractVideoUrl } from '../../utils/extractVideoUrl.js';
 
 export const resourceService = {
   /**

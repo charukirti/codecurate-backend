@@ -9,9 +9,10 @@ import {
   or,
   SQL,
 } from 'drizzle-orm';
-import { db } from '../../db';
-import { NewResource, Resource, resources } from '../../db/schema';
-import { Transaction } from '../reviews/reviews.types';
+import { db } from '../../db/index.js';
+
+import { Transaction } from '../reviews/reviews.types.js';
+import { NewResource, Resource, resources } from '../../db/schema/resources.js';
 
 export const resourceRepository = {
   buildResourceFilters(params: {

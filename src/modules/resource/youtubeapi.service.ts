@@ -2,11 +2,11 @@ import axios from 'axios';
 import {
   PlaylistAPIResponse,
   VideoAPIResponse,
-} from '../../types/youtube-api-response';
-import appConfig from '../../config/app.config';
-import { NotFoundError } from '../../shared/errors';
-import { parseISOtoSeconds } from '../../utils/parseToSeconds';
-import { StatsData } from './resource.types';
+} from '../../types/youtube-api-response.js';
+import appConfig from '../../config/app.config.js';
+import { NotFoundError } from '../../shared/errors.js';
+import { parseISOtoSeconds } from '../../utils/parseToSeconds.js';
+import { StatsData } from './resource.types.js';
 
 export const youtubeApiService = {
   async getVideoDetails(videoId: string): Promise<VideoAPIResponse> {

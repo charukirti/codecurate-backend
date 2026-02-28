@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
-import { reviewTags } from '../../../db/schema';
-import { Transaction } from '../reviews.types';
+import { reviewTags } from '../../../db/schema/reviewTags.js';
+import { Transaction } from '../reviews.types.js';
 
 export const reviewTagsRepository = {
   async createMany(

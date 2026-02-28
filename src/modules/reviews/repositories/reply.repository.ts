@@ -1,7 +1,8 @@
 import { count, desc, eq } from 'drizzle-orm';
-import { db } from '../../../db';
-import { ReviewReply, reviewReply } from '../../../db/schema';
-import { ReplyWithUser, reply } from '../reviews.types';
+import { db } from '../../../db/index.js';
+
+import { ReplyWithUser, reply } from '../reviews.types.js';
+import { ReviewReply, reviewReply } from '../../../db/schema/reviewReply.js';
 
 export const reviewsReplyRepository = {
   async findById(replyId: string): Promise<reply | undefined> {

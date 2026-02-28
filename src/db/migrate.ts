@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { migrate } from 'drizzle-orm/neon-serverless/migrator';
-import { db } from './index';
-import Logger from '../utils/logger';
+import { db } from './index.js';
+import Logger from '../utils/logger.js';
 
 async function runMigrations() {
   Logger.info('Running migrations...');

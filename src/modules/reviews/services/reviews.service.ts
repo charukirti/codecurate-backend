@@ -1,11 +1,11 @@
-import { db } from '../../../db';
-import { Tags } from '../../../db/schema';
+import { db } from '../../../db/index.js';
+import { Tags } from '../../../db/schema/tags.js';
 import {
   PaginatedReviewsResponse,
   reviewData,
   ReviewResponse,
-} from '../reviews.types';
-import { UpdateReviewInput } from '../reviews.schema';
+} from '../reviews.types.js';
+import { UpdateReviewInput } from '../reviews.schema.js';
 
 import {
   ConflictError,
@@ -13,12 +13,12 @@ import {
   InternalError,
   NotFoundError,
   ValidationError,
-} from '../../../shared/errors';
-import { SortType } from '../../../shared/schema';
-import { reviewsRepository } from '../repositories/reviews.repository';
-import { resourceRepository } from '../../resource/resource.repository';
-import { reviewTagsRepository } from '../repositories/reviewTags.repository';
-import { tagsRepository } from '../repositories/tags.repository';
+} from '../../../shared/errors.js';
+import { SortType } from '../../../shared/schema.js';
+import { reviewsRepository } from '../repositories/reviews.repository.js';
+import { resourceRepository } from '../../resource/resource.repository.js';
+import { reviewTagsRepository } from '../repositories/reviewTags.repository.js';
+import { tagsRepository } from '../repositories/tags.repository.js';
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 

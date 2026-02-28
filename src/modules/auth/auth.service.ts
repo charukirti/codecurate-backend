@@ -1,29 +1,29 @@
 import crypto from 'crypto';
-import { UserData } from '../../db/schema';
-import { SignInInput, SignUpInput } from './auth.schema';
+import { UserData } from '../../db/schema/users.js';
+import { SignInInput, SignUpInput } from './auth.schema.js';
 import {
   ConflictError,
   InternalError,
   InvalidCredentialError,
   NotFoundError,
   UnauthorizedError,
-} from '../../shared/errors';
+} from '../../shared/errors.js';
 import bcrypt from 'bcryptjs';
 import {
   generateAccessToken,
   generateRefreshToken,
-} from '../../utils/generateToken';
+} from '../../utils/generateToken.js';
 import jwt from 'jsonwebtoken';
-import authConfig from '../../config/auth.config';
-import { userRepository } from '../users/user.repository';
-import { db } from '../../db';
+import authConfig from '../../config/auth.config.js';
+import { userRepository } from '../users/user.repository.js';
+import { db } from '../../db/index.js';
 
 import {
   sendPasswordResetEmail,
   sendVerificationEmail,
-} from '../../utils/mailer';
+} from '../../utils/mailer.js';
 
-import { authRepository } from './auth.repository';
+import { authRepository } from './auth.repository.js';
 
 export const authService = {
   /**

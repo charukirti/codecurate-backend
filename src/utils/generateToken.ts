@@ -1,5 +1,5 @@
 import jwt, { SignOptions } from 'jsonwebtoken';
-import authConfig from '../config/auth.config';
+import authConfig from '../config/auth.config.js';
 
 export function generateAccessToken(userId: string, role: string) {
   return jwt.sign({ userId, role }, authConfig.access_secret, {

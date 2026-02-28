@@ -1,13 +1,13 @@
-import { ReviewReply } from '../../../db/schema';
-import { paginatedRepliesResponse, replyResponse } from '../reviews.types';
+import { ReviewReply } from '../../../db/schema/reviewReply.js';
+import { paginatedRepliesResponse, replyResponse } from '../reviews.types.js';
 import {
   ForbiddenError,
   InternalError,
   NotFoundError,
-} from '../../../shared/errors';
-import { reviewsRepository } from '../repositories/reviews.repository';
-import { reviewsReplyRepository } from '../repositories/reply.repository';
-import { userRepository } from '../../users/user.repository';
+} from '../../../shared/errors.js';
+import { reviewsRepository } from '../repositories/reviews.repository.js';
+import { reviewsReplyRepository } from '../repositories/reply.repository.js';
+import { userRepository } from '../../users/user.repository.js';
 
 export const reviewReplyService = {
   /* ============================================

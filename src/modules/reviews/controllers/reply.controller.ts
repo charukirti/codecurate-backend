@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
-import { reviewReplyService } from '../services/reply.service';
+import { reviewReplyService } from '../services/reply.service.js';
 import {
   AddReplyInput,
   getRepliesQuerySchema,
   ReviewAndReplyIdParams,
   ReviewAndResourceParams,
   ReviewIdParams,
-} from '../reviews.schema';
-import { UnauthorizedError } from '../../../shared/errors';
+} from '../reviews.schema.js';
+import { UnauthorizedError } from '../../../shared/errors.js';
 export async function addReply(
   req: Request<ReviewAndResourceParams, {}, AddReplyInput>,
   res: Response,

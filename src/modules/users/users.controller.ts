@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
-import { userService } from './users.service';
+import { userService } from './users.service.js';
 import {
   DeleteUserInput,
   getUserReviewsQuerySchema,
   UpdateUserInput,
   UsersReviewsParam,
-} from './users.schema';
-import { UnauthorizedError, ValidationError } from '../../shared/errors';
+} from './users.schema.js';
+import { UnauthorizedError, ValidationError } from '../../shared/errors.js';
 
 export async function getProfile(
   req: Request,

@@ -1,5 +1,7 @@
-import { db } from '../../db';
-import { Reviews, Tags, UserData } from '../../db/schema';
+import { db } from '../../db/index.js';
+import { Reviews } from '../../db/schema/review.js';
+import { Tags } from '../../db/schema/tags.js';
+import { UserData } from '../../db/schema/users.js';
 
 export type reviewData = {
   userId: string;

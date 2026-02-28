@@ -1,7 +1,7 @@
 import { eq, or } from 'drizzle-orm';
-import { db } from '../../db';
-import { CreateUserData, UserData, users } from '../../db/schema';
-import { Transaction } from '../reviews/reviews.types';
+import { db } from '../../db/index.js';
+import { CreateUserData, UserData, users } from '../../db/schema/users.js';
+import { Transaction } from '../reviews/reviews.types.js';
 
 export const userRepository = {
   async create(data: CreateUserData): Promise<UserData | undefined> {
