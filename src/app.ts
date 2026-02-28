@@ -10,9 +10,11 @@ import appConfig from './config/app.config.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerDoc from './swagger.json';
 import { globalRateLimiter } from './middlewares/rateLimiter.js';
+import helmet from 'helmet';
 
 const app = express();
 
+app.use(helmet());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cookieParser());

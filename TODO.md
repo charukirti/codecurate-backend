@@ -9,8 +9,8 @@
 
 # Security Related
 
-- [] Rate limiting
-- [] Header security (Helmet lib)
+- [✅] Rate limiting
+- [✅] Header security (Helmet lib)
 - [✅] CORS config.
 - [✅] DB Indexing
 - [] Cache\*
