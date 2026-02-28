@@ -8,10 +8,14 @@ import { tagsRouter } from './modules/reviews/reviews.routes.js';
 import { ErrorHandler, notFoundHandler } from './middlewares/errorHandler.js';
 import appConfig from './config/app.config.js';
 import swaggerUi from 'swagger-ui-express';
-
 import swaggerDoc from './swagger.json';
+import { globalRateLimiter } from './middlewares/rateLimiter.js';
 
 const app = express();
+
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(cookieParser());
 
 app.use(
   cors({
@@ -39,8 +43,7 @@ app.use(
   })
 );
 
-app.use(express.json());
-app.use(cookieParser());
+app.use('/api/v1', globalRateLimiter);
 
 app.get('/health', (req, res) => {
   res.json({
