@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import authConfig from '../config/auth.config.js';
+import appConfig from '../config/app.config.js';
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -22,7 +23,7 @@ export async function sendVerificationEmail(to: string, token: string) {
 }
 
 export async function sendPasswordResetEmail(to: string, token: string) {
-  const verificationLink = `${authConfig.base_url}/v1/auth/reset-password?token=${token}`;
+  const verificationLink = `${appConfig.client_url}/auth/reset-password?token=${token}`;
   const message = await transporter.sendMail({
     from: authConfig.smtp_user,
     to: to,
