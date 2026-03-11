@@ -201,6 +201,7 @@ export const resourceService = {
 
     const data = await resourceRepository.findAllPaginated({
       search,
+      codeLang,
       topic,
       type,
       limit,
