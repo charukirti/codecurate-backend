@@ -36,6 +36,17 @@ export const userService = {
     return userData;
   },
 
+  async getPublicProfile(username: string) {
+    const user = await userRepository.findByUsername(username);
+    if (!user) throw new NotFoundError('User does not exist');
+    return {
+      id: user.id,
+      username: user.username,
+      name: user.name,
+      createdAt: user.createdAt,
+    };
+  },
+
   /**
    * Update user profile
    * @param userId - user id

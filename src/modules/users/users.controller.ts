@@ -31,6 +31,22 @@ export async function getProfile(
   }
 }
 
+export async function getPublicProfile(
+  req: Request<UsersReviewsParam, {}, {}>,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { username } = req.params;
+    const user = await userService.getPublicProfile(username);
+    res
+      .status(200)
+      .json({ message: 'user data retrived successfully', data: user });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function updateProfile(
   req: Request<{}, {}, UpdateUserInput>,
   res: Response,
