@@ -36,7 +36,16 @@ export const userService = {
     return userData;
   },
 
-  async getPublicProfile(username: string) {
+  /**
+   * Get users public profile via username
+   * @param username - accepts username as param
+   * @returns user profile without password and refresh token and other sensitive data
+   * @throws {NotFoundError} if user does not exist
+   */
+
+  async getPublicProfile(
+    username: string
+  ): Promise<Pick<UserData, 'id' | 'username' | 'name' | 'createdAt'>> {
     const user = await userRepository.findByUsername(username);
     if (!user) throw new NotFoundError('User does not exist');
     return {
