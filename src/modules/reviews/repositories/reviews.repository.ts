@@ -100,7 +100,8 @@ export const reviewsRepository = {
     resourceId: string,
     sort: SortType,
     limit: number,
-    offset: number
+    offset: number,
+    currentUserId?: string
   ): Promise<ReviewWithRelations[]> {
     const sortMapping = {
       newest: desc(reviews.createdAt),
@@ -121,6 +122,15 @@ export const reviewsRepository = {
         reviewTags: {
           with: { tag: true },
         },
+      },
+      extras: {
+        isLikedByCurrentUser: currentUserId
+          ? sql<boolean>`EXISTS (
+            SELECT 1 FROM "reviewLikes"
+            WHERE "reviewLikes".review_id = ${reviews.id}
+            AND "reviewLikes".user_id = ${currentUserId}
+          )`.as('isLikedByCurrentUser')
+          : sql<boolean>`false`.as('isLikedByCurrentUser'),
       },
     });
 

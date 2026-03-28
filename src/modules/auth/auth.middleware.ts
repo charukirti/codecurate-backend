@@ -51,6 +51,38 @@ export function verifyToken(
   }
 }
 
+export function optionalVerifyToken(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void {
+  try {
+    const header = req.headers.authorization;
+
+    if (!header || !header.startsWith('Bearer')) {
+      return next();
+    }
+
+    const token = header.split(' ')[1];
+
+    if (!token) {
+      return next();
+    }
+
+    const decoded = jwt.verify(token, authConfig.access_secret) as {
+      userId: string;
+      role: 'admin' | 'user';
+    };
+
+    req.userId = decoded.userId;
+    req.role = decoded.role;
+
+    next();
+  } catch {
+    next();
+  }
+}
+
 /**
  * Middleware to verify authenticated user has admin role
  * @param req - Express request object with user role from token

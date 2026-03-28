@@ -26,7 +26,7 @@ import {
   updateReviewSchema,
 } from './reviews.schema.js';
 
-import { verifyToken } from '../auth/auth.middleware.js';
+import { optionalVerifyToken, verifyToken } from '../auth/auth.middleware.js';
 
 const router = Router({ mergeParams: true });
 const tagsRouter = Router();
@@ -41,7 +41,12 @@ router.post(
   createReview
 );
 
-router.get('/', validate({ params: resourceIdParamSchema }), getAllReviews);
+router.get(
+  '/',
+  validate({ params: resourceIdParamSchema }),
+  optionalVerifyToken,
+  getAllReviews
+);
 
 router.patch(
   '/:reviewId',

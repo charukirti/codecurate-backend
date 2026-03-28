@@ -67,6 +67,7 @@ export async function getAllReviews(
   next: NextFunction
 ) {
   try {
+    const userId = req.userId;
     const { resourceId } = req.params;
 
     const { page, limit, sort } = getReviewsQuerySchema.parse(req.query);
@@ -76,6 +77,7 @@ export async function getAllReviews(
       page,
       limit,
       sort,
+      currentUserId: userId,
     });
 
     res.status(200).json({

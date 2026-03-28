@@ -137,8 +137,9 @@ export const reviewService = {
     page: number;
     limit: number;
     sort: SortType;
+    currentUserId?: string;
   }): Promise<PaginatedReviewsResponse> {
-    const { resourceId, page, limit, sort } = params;
+    const { resourceId, page, limit, sort, currentUserId } = params;
 
     const offset = (page - 1) * limit;
 
@@ -146,7 +147,8 @@ export const reviewService = {
       resourceId,
       sort,
       limit,
-      offset
+      offset,
+      currentUserId
     );
 
     const reviewsWithTags = allReviews.map((review) => ({

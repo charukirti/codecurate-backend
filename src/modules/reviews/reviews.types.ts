@@ -72,6 +72,7 @@ export type ReviewWithRelations = Reviews & {
     tagId: string;
     tag: Tags;
   }[];
+  isLikedByCurrentUser?: boolean;
 };
 
 /* ---------- review reply repository types -------- */
