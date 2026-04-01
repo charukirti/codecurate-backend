@@ -2,7 +2,7 @@ import { ipKeyGenerator, rateLimit } from 'express-rate-limit';
 
 export const globalRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 50,
+  limit: 700,
   standardHeaders: true,
   legacyHeaders: false,
   statusCode: 429,
