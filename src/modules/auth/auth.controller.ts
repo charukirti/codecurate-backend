@@ -40,7 +40,7 @@ export async function signIn(
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: appConfig.node_env === 'production',
-      sameSite: 'strict',
+      sameSite: appConfig.node_env === 'production' ? 'none' : 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -63,7 +63,11 @@ export async function signOut(req: Request, res: Response, next: NextFunction) {
     }
     await authService.signOut(userId);
 
-    res.clearCookie('refreshToken');
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: appConfig.node_env === 'production',
+      sameSite: appConfig.node_env === 'production' ? 'none' : 'strict',
+    });
 
     res.status(200).json({
       message: 'User successfully signed out',
@@ -90,7 +94,7 @@ export async function refreshToken(
     res.cookie('refreshToken', newRefreshToken, {
       httpOnly: true,
       secure: appConfig.node_env === 'production',
-      sameSite: 'strict',
+      sameSite: appConfig.node_env === 'production' ? 'none' : 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
