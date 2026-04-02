@@ -13,6 +13,7 @@ import { globalRateLimiter } from './middlewares/rateLimiter.js';
 import helmet from 'helmet';
 
 const app = express();
+app.set('trust proxy', 1);
 
 app.use(helmet());
 app.use(express.urlencoded({ extended: false }));
