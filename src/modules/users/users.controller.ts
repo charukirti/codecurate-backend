@@ -106,16 +106,12 @@ export async function deleteUser(
   next: NextFunction
 ) {
   try {
-    const { password, confirmDeletion } = req.body;
+    const { password } = req.body;
 
     const userId = req.userId;
 
     if (!userId) {
       throw new UnauthorizedError('User not authenticated');
-    }
-
-    if (!confirmDeletion) {
-      throw new ValidationError('You must confirm account deletion');
     }
 
     await userService.deleteUser(userId, password);
