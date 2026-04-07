@@ -32,10 +32,12 @@ export function verifyToken(
     const decoded = jwt.verify(token, authConfig.access_secret) as {
       userId: string;
       role: 'admin' | 'user';
+      isVerified: boolean;
     };
 
     req.userId = decoded.userId;
     req.role = decoded.role;
+    req.isVerified = decoded.isVerified;
 
     next();
   } catch (error) {
@@ -50,6 +52,15 @@ export function verifyToken(
     next(error);
   }
 }
+
+/**
+ * Middleware to optionally verify JWT token for authenticated users
+ * If token is valid, userId and role will be added to request object
+ * If token is missing or invalid, request will proceed without authentication
+ * @param req - Express request object containing authorization header
+ * @param res - Express response object
+ * @param next - Express next middleware function
+ */
 
 export function optionalVerifyToken(
   req: Request,
@@ -98,6 +109,27 @@ export function requireAdmin(
 ): void {
   if (req.role !== 'admin') {
     return next(new ForbiddenError('Only admin can access this route'));
+  }
+  next();
+}
+
+/**
+ * Middleware to verify authenticated user has verified email
+ * @param req - Express request object with isVerified flag from token
+ * @param res - Express response object
+ * @param next - Express next middleware function
+ * @throws {ForbiddenError} if user's email is not verified
+ */
+
+export function requireVerified(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void {
+  if (!req.isVerified) {
+    return next(
+      new ForbiddenError('Email verification is required to access this route')
+    );
   }
   next();
 }

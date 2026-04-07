@@ -132,7 +132,11 @@ export const authService = {
       throw new InvalidCredentialError('Invalid email or password');
     }
 
-    const accessToken = generateAccessToken(user.id, user.role);
+    const accessToken = generateAccessToken(
+      user.id,
+      user.role,
+      user.isVerified ?? false
+    );
     const refreshToken = generateRefreshToken(user.id);
 
     await userRepository.updateRefreshToken(refreshToken, user.id);
@@ -232,7 +236,11 @@ export const authService = {
       throw new UnauthorizedError('Invalid refresh token');
     }
 
-    const accessToken = generateAccessToken(user.id, user.role);
+    const accessToken = generateAccessToken(
+      user.id,
+      user.role,
+      user.isVerified ?? false
+    );
 
     const newRefreshToken = generateRefreshToken(user.id);
 

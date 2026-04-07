@@ -5,6 +5,7 @@ export declare global {
     interface Request {
       userId?: string;
       role?: 'admin' | 'user';
+      isVerified?: boolean;
     }
   }
 }
