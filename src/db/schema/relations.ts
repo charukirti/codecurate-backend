@@ -6,6 +6,7 @@ import { tags } from './tags.js';
 import { reviewTags } from './reviewTags.js';
 import { reviewLikes } from './reviewLikes.js';
 import { reviewReply } from './reviewReply.js';
+import { submissions } from './submissions.js';
 
 export const resourcesRelations = relations(resources, ({ many }) => ({
   reviews: many(reviews), // one resource can have multiple reviews
@@ -15,6 +16,12 @@ export const userRelations = relations(users, ({ many }) => ({
   reviews: many(reviews), // one user can have many reviews
   reviewLikes: many(reviewLikes),
   reviewReply: many(reviewReply),
+  submissions: many(submissions, {
+    relationName: 'submitter',
+  }),
+  reviewedSubmissions: many(submissions, {
+    relationName: 'reviewer',
+  }),
 }));
 
 export const reviewsRelations = relations(reviews, ({ one, many }) => ({
@@ -67,5 +74,18 @@ export const reviewReplyRelation = relations(reviewReply, ({ one }) => ({
   user: one(users, {
     fields: [reviewReply.userId],
     references: [users.id],
+  }),
+}));
+
+export const submissionsRelations = relations(submissions, ({ one }) => ({
+  submitter: one(users, {
+    fields: [submissions.userId],
+    references: [users.id],
+    relationName: 'submitter',
+  }),
+  reviewer: one(users, {
+    fields: [submissions.reviewedBy],
+    references: [users.id],
+    relationName: 'reviewer',
   }),
 }));
