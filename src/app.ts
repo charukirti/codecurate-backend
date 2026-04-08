@@ -5,6 +5,7 @@ import authRoutes from './modules/auth/auth.routes.js';
 import userRoutes from './modules/users/users.routes.js';
 import resourceRoutes from './modules/resource/resource.routes.js';
 import { tagsRouter } from './modules/reviews/reviews.routes.js';
+import submissionsRoutes from './modules/submissions/submissions.routes.js';
 import { ErrorHandler, notFoundHandler } from './middlewares/errorHandler.js';
 import appConfig from './config/app.config.js';
 import swaggerUi from 'swagger-ui-express';
@@ -61,6 +62,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/resources', resourceRoutes);
 app.use('/api/v1/reviews/tags', tagsRouter);
+app.use('/api/v1/submissions', submissionsRoutes);
 
 app.use(notFoundHandler);
 
