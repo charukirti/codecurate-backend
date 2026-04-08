@@ -70,4 +70,12 @@ export const submissionsService = {
 
     return newSubmission;
   },
+
+  async getSubmissionsByUserId(userId: string): Promise<Submission[]> {
+    const userSubmissions = await db.query.submissions.findMany({
+      where: eq(submissions.userId, userId),
+    });
+
+    return userSubmissions;
+  },
 };

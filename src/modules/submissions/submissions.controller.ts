@@ -22,3 +22,21 @@ export async function createSubmission(
     next(error);
   }
 }
+
+export async function getUserSubmissions(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const userId = req.userId!;
+    const submissions = await submissionsService.getSubmissionsByUserId(userId);
+
+    res.status(200).json({
+      message: 'User submissions retrieved successfully',
+      data: submissions,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
