@@ -1,8 +1,13 @@
 import { Router } from 'express';
-import { requireVerified, verifyToken } from '../auth/auth.middleware.js';
+import {
+  requireAdmin,
+  requireVerified,
+  verifyToken,
+} from '../auth/auth.middleware.js';
 import { validate } from '../../middlewares/validate.js';
 import {
   createSubmission,
+  getAllSubmissions,
   getUserSubmissions,
 } from './submissions.controller.js';
 import { createSubmissionSchema } from './submissions.schema.js';
@@ -18,5 +23,7 @@ router.post(
 );
 
 router.get('/my-submissions', verifyToken, getUserSubmissions);
+
+router.get('/', verifyToken, requireAdmin, getAllSubmissions);
 
 export default router;

@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { CreateSubmissionInput } from './submissions.schema.js';
+import {
+  CreateSubmissionInput,
+  getAllSubmissionsQuerySchema,
+} from './submissions.schema.js';
 import { submissionsService } from './submissions.service.js';
 
 export async function createSubmission(
@@ -34,6 +37,30 @@ export async function getUserSubmissions(
 
     res.status(200).json({
       message: 'User submissions retrieved successfully',
+      data: submissions,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getAllSubmissions(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { status, page, limit } = getAllSubmissionsQuerySchema.parse(
+      req.query
+    );
+    const submissions = await submissionsService.getAllSubmissions({
+      status,
+      page,
+      limit,
+    });
+
+    res.status(200).json({
+      message: 'All submissions retrieved successfully',
       data: submissions,
     });
   } catch (error) {

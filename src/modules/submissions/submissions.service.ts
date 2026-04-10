@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm';
+import { and, count, eq } from 'drizzle-orm';
 import { db } from '../../db/index.js';
 import { Submission, submissions } from '../../db/schema/index.js';
 import { ConflictError, InternalError } from '../../shared/errors.js';
@@ -71,11 +71,54 @@ export const submissionsService = {
     return newSubmission;
   },
 
+  /**
+   * gets all submissions made by a specific user.
+   * @param userId : The ID of the user whose submissions are to be retrieved.
+   * @returns {Promise<Submission[]>} A promise that resolves to an array of submissions made by the user.
+   */
+
   async getSubmissionsByUserId(userId: string): Promise<Submission[]> {
     const userSubmissions = await db.query.submissions.findMany({
       where: eq(submissions.userId, userId),
     });
 
     return userSubmissions;
+  },
+
+  async getAllSubmissions(params: {
+    status?: 'pending' | 'accepted' | 'rejected';
+    page: number;
+    limit: number;
+  }) {
+    const { status, page, limit } = params;
+    const offset = (page - 1) * limit;
+
+    const whereClause = status ? eq(submissions.status, status) : undefined;
+
+    const data = await db.query.submissions.findMany({
+      where: whereClause,
+      orderBy: (submissions, { desc }) => desc(submissions.createdAt),
+      limit,
+      offset,
+    });
+
+    const [countValue] = await db
+      .select({ count: count() })
+      .from(submissions)
+      .where(whereClause);
+
+    const totalItems = Number(countValue?.count) || 0;
+
+    const totalPages = Math.ceil(totalItems / limit);
+
+    return {
+      data,
+      pagination: {
+        page,
+        limit,
+        totalItems,
+        totalPages,
+      },
+    };
   },
 };

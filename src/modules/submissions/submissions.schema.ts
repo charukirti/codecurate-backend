@@ -7,6 +7,8 @@ const YT_HOSTS = [
   'youtu.be',
 ];
 
+/* Validation schema for creating a submission */
+
 export const createSubmissionSchema = z.object({
   youtubeURL: z.url().refine(
     (u) => {
@@ -26,16 +28,32 @@ export const createSubmissionSchema = z.object({
     .max(100, 'Topic of the video must be at most 100 characters'),
 });
 
+/* Validation schema for reviewing a submission */
 export const reviewSubmissionSchema = z.object({
   adminFeedback: z.string().max(1000).optional(),
 });
 
+/* Validation schema for parameters when reviewing a submission */
 export const reviewSubmissionParamsSchema = z.object({
   submissionId: z.uuid({ message: 'Invalid submission ID format' }),
+});
+
+/* Validation schema for parameters when getting all submissions */
+export const getAllSubmissionsQuerySchema = z.object({
+  status: z
+    .enum(['pending', 'accepted', 'rejected'], {
+      error: 'Invalid status value',
+    })
+    .optional(),
+  page: z.coerce.number().int().min(1).optional().default(1),
+  limit: z.coerce.number().int().min(1).max(50).optional().default(10),
 });
 
 export type CreateSubmissionInput = z.infer<typeof createSubmissionSchema>;
 export type ReviewSubmissionInput = z.infer<typeof reviewSubmissionSchema>;
 export type ReviewSubmissionParamsInput = z.infer<
   typeof reviewSubmissionParamsSchema
+>;
+export type GetAllSubmissionsQueryInput = z.infer<
+  typeof getAllSubmissionsQuerySchema
 >;
