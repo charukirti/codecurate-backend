@@ -1,11 +1,16 @@
 import { and, count, eq } from 'drizzle-orm';
 import { db } from '../../db/index.js';
 import { Submission, submissions } from '../../db/schema/index.js';
-import { ConflictError, InternalError } from '../../shared/errors.js';
+import {
+  ConflictError,
+  InternalError,
+  NotFoundError,
+} from '../../shared/errors.js';
 import { extractVideoUrl } from '../../utils/extractVideoUrl.js';
 import { resourceRepository } from '../resource/resource.repository.js';
 
 import { CreateSubmissionInput } from './submissions.schema.js';
+import { resourceService } from '../resource/resource.service.js';
 
 export const submissionsService = {
   /**
@@ -85,11 +90,26 @@ export const submissionsService = {
     return userSubmissions;
   },
 
+  /**
+   * Retrieves all submissions with optional filtering by status and pagination support for admin panel.
+   * It calculates the total number of items and pages based on the provided limit.
+   * @param params : An object containing optional status filter, page number, and limit for pagination.
+   * @returns A promise that resolves to an object containing the array of submissions and pagination details (current page, limit, total items, total pages).
+   */
+
   async getAllSubmissions(params: {
     status?: 'pending' | 'accepted' | 'rejected';
     page: number;
     limit: number;
-  }) {
+  }): Promise<{
+    data: Submission[];
+    pagination: {
+      page: number;
+      limit: number;
+      totalItems: number;
+      totalPages: number;
+    };
+  }> {
     const { status, page, limit } = params;
     const offset = (page - 1) * limit;
 
@@ -120,5 +140,63 @@ export const submissionsService = {
         totalPages,
       },
     };
+  },
+
+  async acceptSubmission(params: {
+    submissionId: string;
+    adminId: string;
+    videoLang: string;
+    codeLang?: string;
+    instructorName: string;
+    adminFeedback?: string;
+  }) {
+    const {
+      submissionId,
+      adminId,
+      videoLang,
+      codeLang,
+      instructorName,
+      adminFeedback,
+    } = params;
+
+    const submission = await db.query.submissions.findFirst({
+      where: eq(submissions.id, submissionId),
+    });
+
+    if (!submission) {
+      throw new NotFoundError('This submission does not exist.');
+    }
+
+    if (submission.status === 'accepted') {
+      throw new ConflictError('Submission is already accepted.');
+    }
+
+    if (submission.status === 'rejected') {
+      throw new ConflictError('Rejected submissions cannot be accepted.');
+    }
+
+    const { videoId } = extractVideoUrl(submission.youtubeURL);
+
+    const resource = await resourceService.extractFromUrl({
+      url: submission.youtubeURL,
+      videoLang,
+      codeLang,
+      topic: submission.topic,
+      resourceType: videoId ? 'video' : 'playlist',
+      instructorName,
+      description: submission.description ?? undefined,
+    });
+
+    await db
+      .update(submissions)
+      .set({
+        status: 'accepted',
+        reviewedBy: adminId,
+        adminFeedback: adminFeedback ?? null,
+        updatedAt: new Date(),
+      })
+      .where(eq(submissions.id, submissionId));
+
+    return resource;
   },
 };

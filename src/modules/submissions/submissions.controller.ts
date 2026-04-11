@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import {
+  AcceptSubmissionInput,
+  AcceptSubmissionParamsInput,
   CreateSubmissionInput,
   getAllSubmissionsQuerySchema,
 } from './submissions.schema.js';
@@ -62,6 +64,34 @@ export async function getAllSubmissions(
     res.status(200).json({
       message: 'All submissions retrieved successfully',
       data: submissions,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function acceptSubmission(
+  req: Request<AcceptSubmissionParamsInput, {}, AcceptSubmissionInput>,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const adminId = req.userId!;
+    const { submissionId } = req.params;
+    const { videoLang, codeLang, instructorName, adminFeedback } = req.body;
+
+    const acceptedSubmission = await submissionsService.acceptSubmission({
+      submissionId,
+      adminId,
+      videoLang,
+      codeLang,
+      instructorName,
+      adminFeedback,
+    });
+
+    res.status(200).json({
+      message: 'Submission accepted successfully',
+      data: acceptedSubmission,
     });
   } catch (error) {
     next(error);

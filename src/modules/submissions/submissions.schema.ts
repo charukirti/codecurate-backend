@@ -33,8 +33,8 @@ export const reviewSubmissionSchema = z.object({
   adminFeedback: z.string().max(1000).optional(),
 });
 
-/* Validation schema for parameters when reviewing a submission */
-export const reviewSubmissionParamsSchema = z.object({
+/* Validation schema for parameters when accepting a submission */
+export const acceptSubmissionParamSchema = z.object({
   submissionId: z.uuid({ message: 'Invalid submission ID format' }),
 });
 
@@ -49,11 +49,48 @@ export const getAllSubmissionsQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).optional().default(10),
 });
 
+/* Validation schema for accepting a submission */
+
+export const acceptSubmissionSchema = z.object({
+  videoLang: z
+    .string()
+    .min(2, 'Video language must be at least 2 characters')
+    .max(100, 'Video language must be at most 100 characters'),
+  codeLang: z
+    .enum(
+      [
+        'HTML',
+        'CSS',
+        'JavaScript',
+        'Tailwind',
+        'React',
+        'TypeScript',
+        'Node.js',
+        'Go',
+        'Python',
+        'Rust',
+        'Java',
+        'C',
+        'C++',
+        'C#',
+      ],
+      { error: 'Select correct coding language' }
+    )
+    .optional(),
+  instructorName: z
+    .string()
+    .min(2, 'Instructor name must be at least 2 characters')
+    .max(100, 'Instructor name must be at most 255 characters'),
+
+  adminFeedback: z.string().max(1000).optional(),
+});
+
 export type CreateSubmissionInput = z.infer<typeof createSubmissionSchema>;
 export type ReviewSubmissionInput = z.infer<typeof reviewSubmissionSchema>;
-export type ReviewSubmissionParamsInput = z.infer<
-  typeof reviewSubmissionParamsSchema
+export type AcceptSubmissionParamsInput = z.infer<
+  typeof acceptSubmissionParamSchema
 >;
 export type GetAllSubmissionsQueryInput = z.infer<
   typeof getAllSubmissionsQuerySchema
 >;
+export type AcceptSubmissionInput = z.infer<typeof acceptSubmissionSchema>;
