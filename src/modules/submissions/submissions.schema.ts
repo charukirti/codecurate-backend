@@ -28,8 +28,8 @@ export const createSubmissionSchema = z.object({
     .max(100, 'Topic of the video must be at most 100 characters'),
 });
 
-/* Validation schema for reviewing a submission */
-export const reviewSubmissionSchema = z.object({
+/* Validation schema for rejecting a submission */
+export const rejectSubmissionSchema = z.object({
   adminFeedback: z.string().max(1000).optional(),
 });
 
@@ -86,7 +86,7 @@ export const acceptSubmissionSchema = z.object({
 });
 
 export type CreateSubmissionInput = z.infer<typeof createSubmissionSchema>;
-export type ReviewSubmissionInput = z.infer<typeof reviewSubmissionSchema>;
+export type RejectSubmissionInput = z.infer<typeof rejectSubmissionSchema>;
 export type AcceptSubmissionParamsInput = z.infer<
   typeof acceptSubmissionParamSchema
 >;

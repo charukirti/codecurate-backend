@@ -1,6 +1,6 @@
 import { and, count, eq } from 'drizzle-orm';
 import { db } from '../../db/index.js';
-import { Submission, submissions } from '../../db/schema/index.js';
+import { Resource, Submission, submissions } from '../../db/schema/index.js';
 import {
   ConflictError,
   InternalError,
@@ -142,6 +142,15 @@ export const submissionsService = {
     };
   },
 
+  /**
+   * Accepts a submission by its ID, extracts resource information from the YouTube URL, creates a new resource in the library, and updates the submission status to 'accepted'.
+   * It checks for the existence of the submission, ensures it is not already accepted or rejected, and handles the extraction of video or playlist information to create the resource.
+   * @param params : An object containing the submission ID, admin ID, video language, optional code language, instructor name, and optional admin feedback.
+   * @throws {NotFoundError} If the submission with the given ID does not exist.
+   * @throws {ConflictError} If the submission is already accepted or rejected.
+   * @returns A promise that resolves to the created resource.
+   */
+
   async acceptSubmission(params: {
     submissionId: string;
     adminId: string;
@@ -149,7 +158,7 @@ export const submissionsService = {
     codeLang?: string;
     instructorName: string;
     adminFeedback?: string;
-  }) {
+  }): Promise<Resource> {
     const {
       submissionId,
       adminId,
@@ -198,5 +207,46 @@ export const submissionsService = {
       .where(eq(submissions.id, submissionId));
 
     return resource;
+  },
+
+  /**
+   * Rejects a submission by its ID, updates the submission status to 'rejected', and optionally saves admin feedback. It checks for the existence of the submission and ensures it is not already accepted or rejected before performing the update.
+   * @param params : An object containing the submission ID, admin ID, and optional admin feedback.
+   * @throws {NotFoundError} If the submission with the given ID does not exist.
+   * @throws {ConflictError} If the submission is already accepted or rejected.
+ 
+   */
+  async rejectSubmission(params: {
+    submissionId: string;
+    adminId: string;
+    adminFeedback?: string;
+  }): Promise<void> {
+    const { submissionId, adminId, adminFeedback } = params;
+
+    const submission = await db.query.submissions.findFirst({
+      where: eq(submissions.id, submissionId),
+    });
+
+    if (!submission) {
+      throw new NotFoundError('This submission does not exist.');
+    }
+
+    if (submission.status === 'accepted') {
+      throw new ConflictError('Accepted submissions cannot be rejected.');
+    }
+
+    if (submission.status === 'rejected') {
+      throw new ConflictError('Submission is already rejected.');
+    }
+
+    await db
+      .update(submissions)
+      .set({
+        status: 'rejected',
+        reviewedBy: adminId,
+        adminFeedback: adminFeedback,
+        updatedAt: new Date(),
+      })
+      .where(eq(submissions.id, submissionId));
   },
 };

@@ -4,6 +4,7 @@ import {
   AcceptSubmissionParamsInput,
   CreateSubmissionInput,
   getAllSubmissionsQuerySchema,
+  RejectSubmissionInput,
 } from './submissions.schema.js';
 import { submissionsService } from './submissions.service.js';
 
@@ -92,6 +93,30 @@ export async function acceptSubmission(
     res.status(200).json({
       message: 'Submission accepted successfully',
       data: acceptedSubmission,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function rejectSubmission(
+  req: Request<AcceptSubmissionParamsInput, {}, RejectSubmissionInput>,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const adminId = req.userId!;
+    const { submissionId } = req.params;
+    const { adminFeedback } = req.body;
+
+    await submissionsService.rejectSubmission({
+      submissionId,
+      adminId,
+      adminFeedback,
+    });
+
+    res.status(200).json({
+      message: 'Submission rejected successfully',
     });
   } catch (error) {
     next(error);

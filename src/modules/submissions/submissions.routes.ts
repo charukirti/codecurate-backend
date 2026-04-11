@@ -10,11 +10,13 @@ import {
   createSubmission,
   getAllSubmissions,
   getUserSubmissions,
+  rejectSubmission,
 } from './submissions.controller.js';
 import {
   acceptSubmissionParamSchema,
   acceptSubmissionSchema,
   createSubmissionSchema,
+  rejectSubmissionSchema,
 } from './submissions.schema.js';
 
 const router = Router();
@@ -40,6 +42,17 @@ router.patch(
     params: acceptSubmissionParamSchema,
   }),
   acceptSubmission
+);
+
+router.patch(
+  '/:submissionId/reject',
+  verifyToken,
+  requireAdmin,
+  validate({
+    params: acceptSubmissionParamSchema,
+    body: rejectSubmissionSchema,
+  }),
+  rejectSubmission
 );
 
 export default router;
