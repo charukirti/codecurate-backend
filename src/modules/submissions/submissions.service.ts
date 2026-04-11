@@ -1,6 +1,4 @@
-import { and, count, eq } from 'drizzle-orm';
-import { db } from '../../db/index.js';
-import { Resource, Submission, submissions } from '../../db/schema/index.js';
+import { Resource, Submission } from '../../db/schema/index.js';
 import {
   ConflictError,
   InternalError,
@@ -11,6 +9,7 @@ import { resourceRepository } from '../resource/resource.repository.js';
 
 import { CreateSubmissionInput } from './submissions.schema.js';
 import { resourceService } from '../resource/resource.service.js';
+import { submissionsRepository } from './submissions.repository.js';
 
 export const submissionsService = {
   /**
@@ -43,29 +42,21 @@ export const submissionsService = {
         );
     }
 
-    /* TODO: Extract db queries to the repository files later. */
-    const pendingSubmissins = await db.query.submissions.findFirst({
-      where: and(
-        eq(submissions.youtubeURL, youtubeURL),
-        eq(submissions.status, 'pending')
-      ),
-    });
+    const pendingSubmissins =
+      await submissionsRepository.findPendingByURL(youtubeURL);
 
     if (pendingSubmissins)
       throw new ConflictError(
         'A submission with this YouTube URL is already pending review.'
       );
 
-    const [newSubmission] = await db
-      .insert(submissions)
-      .values({
-        userId,
-        youtubeURL,
-        title,
-        description,
-        topic,
-      })
-      .returning();
+    const newSubmission = await submissionsRepository.create({
+      userId,
+      youtubeURL,
+      title,
+      description,
+      topic,
+    });
 
     if (!newSubmission) {
       throw new InternalError(
@@ -83,9 +74,7 @@ export const submissionsService = {
    */
 
   async getSubmissionsByUserId(userId: string): Promise<Submission[]> {
-    const userSubmissions = await db.query.submissions.findMany({
-      where: eq(submissions.userId, userId),
-    });
+    const userSubmissions = await submissionsRepository.findByUserId(userId);
 
     return userSubmissions;
   },
@@ -113,21 +102,15 @@ export const submissionsService = {
     const { status, page, limit } = params;
     const offset = (page - 1) * limit;
 
-    const whereClause = status ? eq(submissions.status, status) : undefined;
-
-    const data = await db.query.submissions.findMany({
-      where: whereClause,
-      orderBy: (submissions, { desc }) => desc(submissions.createdAt),
-      limit,
+    const data = await submissionsRepository.findAllPaginated({
+      status,
       offset,
+      limit,
     });
 
-    const [countValue] = await db
-      .select({ count: count() })
-      .from(submissions)
-      .where(whereClause);
-
-    const totalItems = Number(countValue?.count) || 0;
+    const totalItems = status
+      ? await submissionsRepository.countByStatus(status)
+      : await submissionsRepository.countAll();
 
     const totalPages = Math.ceil(totalItems / limit);
 
@@ -168,9 +151,7 @@ export const submissionsService = {
       adminFeedback,
     } = params;
 
-    const submission = await db.query.submissions.findFirst({
-      where: eq(submissions.id, submissionId),
-    });
+    const submission = await submissionsRepository.findById(submissionId);
 
     if (!submission) {
       throw new NotFoundError('This submission does not exist.');
@@ -196,15 +177,11 @@ export const submissionsService = {
       description: submission.description ?? undefined,
     });
 
-    await db
-      .update(submissions)
-      .set({
-        status: 'accepted',
-        reviewedBy: adminId,
-        adminFeedback: adminFeedback ?? null,
-        updatedAt: new Date(),
-      })
-      .where(eq(submissions.id, submissionId));
+    await submissionsRepository.updateToAccepted({
+      submissionId,
+      adminId,
+      adminFeedback,
+    });
 
     return resource;
   },
@@ -223,9 +200,7 @@ export const submissionsService = {
   }): Promise<void> {
     const { submissionId, adminId, adminFeedback } = params;
 
-    const submission = await db.query.submissions.findFirst({
-      where: eq(submissions.id, submissionId),
-    });
+    const submission = await submissionsRepository.findById(submissionId);
 
     if (!submission) {
       throw new NotFoundError('This submission does not exist.');
@@ -239,14 +214,10 @@ export const submissionsService = {
       throw new ConflictError('Submission is already rejected.');
     }
 
-    await db
-      .update(submissions)
-      .set({
-        status: 'rejected',
-        reviewedBy: adminId,
-        adminFeedback: adminFeedback,
-        updatedAt: new Date(),
-      })
-      .where(eq(submissions.id, submissionId));
+    await submissionsRepository.updateToRejected({
+      submissionId,
+      adminId,
+      adminFeedback,
+    });
   },
 };
