@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './modules/auth/auth.routes.js';
 import userRoutes from './modules/users/users.routes.js';
 import resourceRoutes from './modules/resource/resource.routes.js';
+import adminRoutes from './modules/admin/admin.routes.js';
 import { tagsRouter } from './modules/reviews/reviews.routes.js';
 import submissionsRoutes from './modules/submissions/submissions.routes.js';
 import { ErrorHandler, notFoundHandler } from './middlewares/errorHandler.js';
@@ -63,6 +64,7 @@ app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/resources', resourceRoutes);
 app.use('/api/v1/reviews/tags', tagsRouter);
 app.use('/api/v1/submissions', submissionsRoutes);
+app.use('/api/v1/admin', adminRoutes);
 
 app.use(notFoundHandler);
 
