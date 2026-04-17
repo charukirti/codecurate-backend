@@ -56,7 +56,7 @@ export async function getAllSubmissions(
     const { status, page, limit } = getAllSubmissionsQuerySchema.parse(
       req.query
     );
-    const submissions = await submissionsService.getAllSubmissions({
+    const { data, pagination } = await submissionsService.getAllSubmissions({
       status,
       page,
       limit,
@@ -64,7 +64,8 @@ export async function getAllSubmissions(
 
     res.status(200).json({
       message: 'All submissions retrieved successfully',
-      data: submissions,
+      data,
+      pagination,
     });
   } catch (error) {
     next(error);

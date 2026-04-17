@@ -57,6 +57,15 @@ export const submissionsRepository = {
     const { status, offset, limit } = params;
     return await db.query.submissions.findMany({
       where: status ? eq(submissions.status, status) : undefined,
+      with: {
+        submitter: {
+          columns: {
+            id: true,
+            username: true,
+            email: true,
+          },
+        },
+      },
       orderBy: (submissions, { desc }) => desc(submissions.createdAt),
       limit,
       offset,

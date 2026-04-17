@@ -10,6 +10,7 @@ import { resourceRepository } from '../resource/resource.repository.js';
 import { CreateSubmissionInput } from './submissions.schema.js';
 import { resourceService } from '../resource/resource.service.js';
 import { submissionsRepository } from './submissions.repository.js';
+import { Submissions } from './submissions.types.js';
 
 export const submissionsService = {
   /**
@@ -91,7 +92,7 @@ export const submissionsService = {
     page: number;
     limit: number;
   }): Promise<{
-    data: Submission[];
+    data: Submissions[];
     pagination: {
       page: number;
       limit: number;
