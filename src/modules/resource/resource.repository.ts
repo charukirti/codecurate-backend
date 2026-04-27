@@ -3,7 +3,7 @@ import {
   count,
   desc,
   eq,
-  like,
+  ilike,
   ne,
   notInArray,
   or,
@@ -40,8 +40,8 @@ export const resourceRepository = {
       const searchTerm = `%${search}%`;
       conditions.push(
         or(
-          like(resources.title, searchTerm),
-          like(resources.channelName, searchTerm)
+          ilike(resources.title, searchTerm),
+          ilike(resources.channelName, searchTerm)
         )
       );
     }
