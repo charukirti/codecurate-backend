@@ -7,9 +7,6 @@ export * from './reviewTags.js';
 export * from './reviewLikes.js';
 export * from './reviewReply.js';
 export * from './submissions.js';
-export * from './resourceTags.js';
-export * from './resourceTagsResources.js';
-export * from './resourceTagsSynonyms.js';
 // export relations
 
 export * from './relations.js';
