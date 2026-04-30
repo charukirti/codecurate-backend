@@ -12,8 +12,6 @@
     "db:migrate": "tsx src/db/migrate.ts",
     "seed:admin": "tsx --env-file=.env src/scripts/createAdmin",
     "seed:tags": "tsx --env-file=.env src/scripts/createTags",
-    "seed:resourceTags": "tsx --env-file=.env src/scripts/seedResourceTag",
-    "seed:assignTags": "tsx --env-file=.env src/scripts/assignTags",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write 'src/**/*.ts'",
