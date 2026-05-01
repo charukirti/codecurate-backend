@@ -34,7 +34,7 @@ app.use(
       }
 
       if (!origin) {
-        return callback(new Error('Origin not allowed'));
+        return callback(null, true);
       }
 
       if (allowedOrigins.includes(origin)) {
